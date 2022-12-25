@@ -5,7 +5,7 @@ const dim = 500;
 canvas.width = dim;
 canvas.height = dim;
 // grid setup
-const N = 10;
+const N = 100;
 const r = N;
 const c = N;
 
@@ -15,7 +15,7 @@ let w = dim / N;
 // setup grid 
 let grid = [];
 let iter = 0;
-const iterF = 0.001;
+const iterF = 0.01;
 
 
 //           ____uY___ 
@@ -96,14 +96,14 @@ let tempgrid = grid;
 
 function updateGrid() {
 
-    
+
     for (let i = 0; i < r; i++) {
         for (let j = 0; j < c; j++) {
             tempgrid[i][j].diffuse();
         }
     }
-    for (let i = 1; i < r-1; i++) {
-        for (let j = 1; j < c-1; j++) {
+    for (let i = 1; i < r - 1; i++) {
+        for (let j = 1; j < c - 1; j++) {
             tempgrid[1][0].advect();
         }
     }
@@ -134,7 +134,7 @@ function drawGrid() {
         }
     }
 }
-    
+
 
 function mainloop() {
 
@@ -168,7 +168,13 @@ canvas.addEventListener('mousemove', (e) => {
         idx.y = N - 2;
     }
     // 
-    grid[idx.x][idx.y].d0 = 0;
+    for (let i = 0; i < N; i++) {
+        for (let i = 0; i < N*0.1; i++) {
+            mousex = idx.x + i;
+            mousey = idx.y + i;
+            grid[mousex][mousey].d0 = 0;
 
+        }
+    }
 
 });

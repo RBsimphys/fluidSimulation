@@ -34,19 +34,19 @@ class Cell {
         this.df;
         this.i = i;
         this.u = u;
-        this.dist = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // zeroth, Nth, Sth, Est, Wst, NE, NW, SE, SW
-        
+        this.fin = new Array(9);
+
+        for (let i = 0; i < 9; i++) {
+            this.fin[i] = dotProduct(e[i], this.u);
+        }    // zeroth, Nth, Sth, Est, Wst, NE, NW, SE, SW
+        this.fout = new Array(9); 
 
     }
     stream() {
-
-        for (let i = 0; i < 9; i++) {
-            this.dist[i] = dotProduct(e[i], this.u);
-        }   
-        console.log(this.dist); 
-        this.d0 = this.dist.reduce((a, b) => a + b, 0); 
+        this.d0 = this.fin.reduce((a, b) => a + b, 0); 
 
     }
+    collide(){}
 
 }
 
@@ -63,7 +63,7 @@ function updateGrid() {
     meshGrid = tempGrid; 
 }
 
-
+console.table(meshGrid[10].fin)
 
 
 function drawGrid() {

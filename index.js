@@ -1,124 +1,237 @@
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 // canvas setup 
-const dim = 400;
+const dim = 300;
 canvas.width = dim;
 canvas.height = dim;
 
 // flow grid setup
-const N = 100;
+const N = 50;
 const size = N * N;
 const gridSpacing = dim / N;
 
+const viscosity = 0.0001	// kinematic viscosity coefficient in natural units
+const omega = 0.8;
+// 1 / (3 * viscosity + 0.5);
 
-const Re = 300; //reynolds #
-const u = [0, 0.04];
-const viscocisty = u * gridSpacing / Re; //viscocisty 
-const omega = 1 / (3 * viscocisty + 0.5);// relaxation paremeter 
-const soundSpeed = 1 / Math.sqrt(3);
-// velocity distribution and their weights, D2Q9  
-const e =
-    [[0, 0],
-    [0, 1], [0, -1], [1, 0], [-1, 0],
-    [1, 1], [1, -1], [-1, 1], [-1, -1]];
-const w =
-    [4 / 9,
-    1 / 9, 1 / 9, 1 / 9, 1 / 9,
-    1 / 36, 1 / 36, 1 / 36, 1 / 36]; // wights in order, zeroth, Nth, Sth, Est, Wst, NE, NW, SE, SW
+// velocity directions,
+const e = [
+    [0, 0],                                  // N0
+    [0, 1], [1, 0], [0, -1], [-1, 0],        // N, E, S, W
+    [1, 1], [-1, 1], [-1, -1], [1, -1]       // NE, SE, SW, NW     
+]
+
+// weights 
+const w = [
+    4 / 9,                         // N0
+    1 / 9, 1 / 9, 1 / 9, 1 / 9,    // N1, E2, S3, W4
+    1 / 36, 1 / 36, 1 / 36, 1 / 36 // NE5, SE6, SW7, NW8
+];
+
 
 let meshGrid = new Array(size);
 
 class Cell {
-    constructor(i, d0, u) {
-        this.d0 = d0;
-        this.df;
-        this.i = i;
-        this.u = u;
-        this.fin = new Array(9);
+    constructor(index, rho, ux, uy, isbound, isinlet) {
+        this.i = index;
+        this.isbound = isbound;
+        this.isinlet = isinlet;
 
+        //macroscopic density and velocity
+        this.rho = rho;
+        this.ux = ux;
+        this.uy = uy;
+
+        this.Ni = [
+            this.rho / 9, this.rho / 9, this.rho / 9, this.rho / 9,
+            this.rho / 9, this.rho / 9, this.rho / 9, this.rho / 9,
+            this.rho / 9];
+        this.Neq;
+
+    }
+
+    equalibrium() {
+
+        if (this.isbound) return;
+        let m = [];
+        for (let i = 0; i < e.length; i++) {
+            m[i] = 1 + (3 * (dotMatrix(e[i], [this.ux, this.uy]))) +
+                ((9 / 2) * dotMatrix(e[i], [this.ux, this.uy]) * dotMatrix(e[i], [this.ux, this.uy])) -
+                ((3 / 2) * (Math.sqrt((this.ux * this.ux) + (this.uy * this.uy))))
+        }
+        let wrho = scaleMatrix(this.rho, w);
+
+
+        let n = [];
         for (let i = 0; i < 9; i++) {
-            this.fin[i] = dotProduct(e[i], this.u);
-        }    // zeroth, Nth, Sth, Est, Wst, NE, NW, SE, SW
-        this.fout = new Array(9); 
+            n[i] = m[i] * wrho[i];
+        }
+        this.Neq = n; // N0, N1 E2 S3 W4, NE5, SE6, SW7, NW8
 
     }
+
     stream() {
-        this.d0 = this.fin.reduce((a, b) => a + b, 0); 
+        if (this.isbound) return;
+        let Nth = this.i - N, Est = this.i + 1, Sth = this.i + N, Wst = this.i - 1;
+        // N E S W
+        meshGrid[this.i].Ni[1] = tempGrid[Nth].isbound ? meshGrid[this.i].Ni[3] : tempGrid[Nth].Ni[1];
+        meshGrid[this.i].Ni[2] = tempGrid[Est].isbound ? meshGrid[this.i].Ni[4] : tempGrid[Est].Ni[2];
+        meshGrid[this.i].Ni[3] = tempGrid[Sth].isbound ? meshGrid[this.i].Ni[1] : tempGrid[Sth].Ni[3];
+        meshGrid[this.i].Ni[4] = tempGrid[Wst].isbound ? meshGrid[this.i].Ni[2] : tempGrid[Wst].Ni[4];
+
+        // NE SE SW NW 
+        meshGrid[this.i].Ni[5] = tempGrid[Nth + 1].isbound ? meshGrid[this.i].Ni[7] : tempGrid[Nth + 1].Ni[5];
+        meshGrid[this.i].Ni[6] = tempGrid[Sth + 1].isbound ? meshGrid[this.i].Ni[8] : tempGrid[Sth + 1].Ni[6];
+        meshGrid[this.i].Ni[7] = tempGrid[Sth - 1].isbound ? meshGrid[this.i].Ni[5] : tempGrid[Sth - 1].Ni[7];
+        meshGrid[this.i].Ni[8] = tempGrid[Nth - 1].isbound ? meshGrid[this.i].Ni[6] : tempGrid[Nth + 1].Ni[8];
 
     }
-    collide(){}
+
+    collide() {
+        this.equalibrium();
+        if (this.isbound) return;
+        // relax so density is closer to equilibrium 
+        for (let i = 0; i < 9; i++) {
+            this.Ni[i] = this.Ni[i] + omega * (this.Neq[i] - this.Ni[i]);
+        }
+
+        // get new macroscopic variables based on relaxation 
+        this.rho = sumMatrix(this.Ni);
+        this.ux = 0;
+        this.uy = 0;
+        this.Ni.forEach((n, i) => {
+            this.ux += e[i][0] * n;
+            this.uy += e[i][1] * n;
+        });
+        if (this.rho !== 0) {
+            this.ux /= this.rho;
+            this.uy /= this.rho;
+        }
+
+
+    }
 
 }
 
 for (let i = 0; i < size; i++) {
-    meshGrid[i] = new Cell(i, 0, u, false);
+    meshGrid[i] = new Cell(i, 0, 0, 0, false, false);
 }
 
-let tempGrid = meshGrid; 
+
+function setBoundary() {
+    for (let i = 0; i < N; i++) {
+        meshGrid[IX(0, i)].isbound = true;
+        meshGrid[IX(N - 1, i)].isbound = true;
+        meshGrid[IX(i, N - 1)].isbound = true;
+        meshGrid[IX(i, 0)].isbound = true;
+    }
+
+    for (let i = 1; i < N / 3; i++) {
+        meshGrid[IX(i, 20)].isbound = true;
+    }
+}
+
+
+function initialState() {
+    meshGrid[IX(2, 10)].rho = 1;
+    meshGrid[IX(2, 10)].ux = 0.1;
+
+}
+
+setBoundary();
+
+let tempGrid = meshGrid;
 
 function updateGrid() {
+
+
     for (let i = 0; i < size; i++) {
-        tempGrid[i].stream();
+        meshGrid[i].stream();
     }
-    meshGrid = tempGrid; 
+
+
+    for (let i = 0; i < size; i++) {
+        meshGrid[i].collide();
+    }
+
+    tempGrid = meshGrid;
+
+
+
 }
 
-console.table(meshGrid[10].fin)
-
-
-function drawGrid() {
+function draw() {
     for (let i = 0; i < N; i++) {
         for (let j = 0; j < N; j++) {
-            let dens = meshGrid[IX(i, j)].d0;
-            let sat = 100 * (1 - dens);
-
-            ctx.fillStyle = `hsl(0,0%,${sat}%)`
-            ctx.strokeStyle = "#FF0000";
+            let color;
+            if (meshGrid[IX(i, j)].isbound) {
+                color = 0;
+                ctx.fillStyle = `rgb(0, 0, 255)`;
+            } else {
+                color = Math.floor(255 - 1000000 * meshGrid[IX(i, j)].rho);
+                ctx.fillStyle = `rgb(${color}, 255, 255)`;
+            }
             ctx.fillRect(i * gridSpacing, j * gridSpacing, gridSpacing, gridSpacing);
-            // ctx.fillStyle = "black";
-            // ctx.font = "15px serif";
-            // ctx.fillText(`${Math.round(d * 100) / 100}`, i * w, j * w)
         }
     }
 }
 
-
-
-
+// initialState();
 function mainloop() {
     updateGrid();
-    drawGrid();
-    // requestAnimationFrame(mainloop);
+    draw();
+    requestAnimationFrame(mainloop);
 }
-setInterval(mainloop, 1000);
-// mainloop();
 
-canvas.addEventListener('mousemove', (e) => {
-    e.preventDefault();
-    let x = Math.floor(e.offsetX / gridSpacing);
-    let y = Math.floor(e.offsetY / gridSpacing);
-    if (x < 0) {
-        x = 1;
-    }
-    if (x > N - 1) {
-        x = N - 2;
-    }
-    if (y < 0) {
-        y = 1;
-    }
-    if (y > N - 1) {
-        y = N - 2;
-    }
-    // 
-    meshGrid[IX(x, y)].d0 = 1;
+// setInterval(updateGrid, 1000);
+// setInterval(draw, 10);
+mainloop();
 
-})
+function multiplyMatrices(a, b) {
+    return a.map((x, i) => { x * b[i] });
+}
 
+function sumMatrix(a) {
+    return a.reduce((a, b) => a + b)
 
-function dotProduct(a, b) {
+}
+function scaleMatrix(scalar, array) {
+    return array.map((x) => x * scalar);
+}
+
+function dotMatrix(a, b) {
     return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
 }
 
 function IX(i, j) {
-    return (i + N * j);
+    return i + N * j;
 }
+
+
+
+canvas.addEventListener('mousemove', (e) => {
+    e.preventDefault();
+
+    let mouse = {
+        i: Math.floor(e.offsetX / gridSpacing),
+        j: Math.floor(e.offsetY / gridSpacing),
+    };
+    // check for boundaries
+    if (mouse.i < 0) {
+        mouse.i = 1;
+    }
+    if (mouse.i > N - 1) {
+        mouse.i = N - 2;
+    }
+    if (mouse.j < 0) {
+        mouse.j = 1;
+    }
+    if (mouse.j > N - 1) {
+        mouse.j = N - 2;
+    }
+
+    meshGrid[IX(mouse.i, mouse.j)].ux = -1;
+    meshGrid[IX(mouse.i, mouse.j)].uy = 0;
+    meshGrid[IX(mouse.i, mouse.j)].rho = 1;
+
+});

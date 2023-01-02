@@ -4,22 +4,14 @@ const ctx = canvas.getContext("2d");
 const dim = 300;
 canvas.width = dim;
 canvas.height = dim;
-<<<<<<< HEAD
-=======
-// grid setup
-const N = 100;
-const r = N;
-const c = N;
->>>>>>> refs/remotes/origin/main
 
 // flow grid setup
 const N = 50;
 const size = N * N;
 const gridSpacing = dim / N;
 
-const viscosity = 0.0001	// kinematic viscosity coefficient in natural units
-const omega = 0.8;
-// 1 / (3 * viscosity + 0.5);
+const viscosity = 0.21	// kinematic viscosity coefficient in natural units
+const omega = 1 / (3 * viscosity + 0.5);
 
 // velocity directions,
 const e = [
@@ -36,14 +28,7 @@ const w = [
 ];
 
 
-<<<<<<< HEAD
 let meshGrid = new Array(size);
-=======
-// setup grid 
-let grid = [];
-let iter = 0;
-const iterF = 0.01;
->>>>>>> refs/remotes/origin/main
 
 class Cell {
     constructor(index, rho, ux, uy, isbound, isinlet) {
@@ -65,8 +50,6 @@ class Cell {
     }
 
     equalibrium() {
-
-        if (this.isbound) return;
         let m = [];
         for (let i = 0; i < e.length; i++) {
             m[i] = 1 + (3 * (dotMatrix(e[i], [this.ux, this.uy]))) +
@@ -74,8 +57,9 @@ class Cell {
                 ((3 / 2) * (Math.sqrt((this.ux * this.ux) + (this.uy * this.uy))))
         }
         let wrho = scaleMatrix(this.rho, w);
-
-
+        
+        if (this.isbound) return;
+        
         let n = [];
         for (let i = 0; i < 9; i++) {
             n[i] = m[i] * wrho[i];
@@ -115,9 +99,9 @@ class Cell {
         this.uy = 0;
         this.Ni.forEach((n, i) => {
             this.ux += e[i][0] * n;
-            this.uy += e[i][1] * n;
+            this.uy += e[i][0] * n;
         });
-        if (this.rho !== 0) {
+        if (this.rho > 0) {
             this.ux /= this.rho;
             this.uy /= this.rho;
         }
@@ -128,7 +112,7 @@ class Cell {
 }
 
 for (let i = 0; i < size; i++) {
-    meshGrid[i] = new Cell(i, 0, 0, 0, false, false);
+    meshGrid[i] = new Cell(i, 0, -1, 0, false, false);
 }
 
 
@@ -159,27 +143,14 @@ let tempGrid = meshGrid;
 function updateGrid() {
 
 
-<<<<<<< HEAD
     for (let i = 0; i < size; i++) {
         meshGrid[i].stream();
-=======
-    for (let i = 0; i < r; i++) {
-        for (let j = 0; j < c; j++) {
-            tempgrid[i][j].diffuse();
-        }
-    }
-    for (let i = 1; i < r - 1; i++) {
-        for (let j = 1; j < c - 1; j++) {
-            tempgrid[1][0].advect();
-        }
->>>>>>> refs/remotes/origin/main
     }
 
 
     for (let i = 0; i < size; i++) {
         meshGrid[i].collide();
     }
-
     tempGrid = meshGrid;
 
 
@@ -201,18 +172,15 @@ function draw() {
         }
     }
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> refs/remotes/origin/main
-
-// initialState();
+initialState();
 function mainloop() {
     updateGrid();
     draw();
     requestAnimationFrame(mainloop);
 }
 
+// setInterval(initialState, 1000);
 // setInterval(updateGrid, 1000);
 // setInterval(draw, 10);
 mainloop();
@@ -259,21 +227,9 @@ canvas.addEventListener('mousemove', (e) => {
     if (mouse.j > N - 1) {
         mouse.j = N - 2;
     }
-<<<<<<< HEAD
 
     meshGrid[IX(mouse.i, mouse.j)].ux = -1;
     meshGrid[IX(mouse.i, mouse.j)].uy = 0;
     meshGrid[IX(mouse.i, mouse.j)].rho = 1;
-=======
-    // 
-    for (let i = 0; i < N; i++) {
-        for (let i = 0; i < N*0.1; i++) {
-            mousex = idx.x + i;
-            mousey = idx.y + i;
-            grid[mousex][mousey].d0 = 0;
-
-        }
-    }
->>>>>>> refs/remotes/origin/main
 
 });

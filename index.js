@@ -10,7 +10,7 @@ const N = 50;
 const size = N * N;
 const gridSpacing = dim / N;
 
-const viscosity = 0.21;	// kinematic viscosity coefficient in natural units
+const viscosity = 1 / 4; 	// kinematic viscosity coefficient in natural units
 const omega = 1 / (3 * viscosity + 0.5);
 
 // velocity directions,
@@ -57,9 +57,9 @@ class Cell {
                 ((3 / 2) * (Math.sqrt((this.ux * this.ux) + (this.uy * this.uy))))
         }
         let wrho = scaleMatrix(this.rho, w);
-        
+
         if (this.isbound) return;
-        
+
         let n = [];
         for (let i = 0; i < 9; i++) {
             n[i] = m[i] * wrho[i];
@@ -101,7 +101,7 @@ class Cell {
             this.ux += e[i][0] * n;
             this.uy += e[i][1] * n;
         });
-        if (this.rho !== 0) {
+        if (this.rho > 0) {
             this.ux /= this.rho;
             this.uy /= this.rho;
         }
@@ -139,6 +139,7 @@ function initialState() {
 setBoundary();
 
 let tempGrid = meshGrid;
+
 
 function updateGrid() {
 
@@ -228,8 +229,12 @@ canvas.addEventListener('mousemove', (e) => {
         mouse.j = N - 2;
     }
 
-    meshGrid[IX(mouse.i, mouse.j)].ux = -1;
+    meshGrid[IX(mouse.i, mouse.j)].ux = 0;
     meshGrid[IX(mouse.i, mouse.j)].uy = 0;
     meshGrid[IX(mouse.i, mouse.j)].rho = 1;
 
 });
+
+
+
+

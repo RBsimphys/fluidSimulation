@@ -4,6 +4,13 @@ const ctx = canvas.getContext("2d");
 const dim = 300;
 canvas.width = dim;
 canvas.height = dim;
+<<<<<<< HEAD
+=======
+// grid setup
+const N = 100;
+const r = N;
+const c = N;
+>>>>>>> refs/remotes/origin/main
 
 // flow grid setup
 const N = 50;
@@ -29,7 +36,14 @@ const w = [
 ];
 
 
+<<<<<<< HEAD
 let meshGrid = new Array(size);
+=======
+// setup grid 
+let grid = [];
+let iter = 0;
+const iterF = 0.01;
+>>>>>>> refs/remotes/origin/main
 
 class Cell {
     constructor(index, rho, ux, uy, isbound, isinlet) {
@@ -145,8 +159,20 @@ let tempGrid = meshGrid;
 function updateGrid() {
 
 
+<<<<<<< HEAD
     for (let i = 0; i < size; i++) {
         meshGrid[i].stream();
+=======
+    for (let i = 0; i < r; i++) {
+        for (let j = 0; j < c; j++) {
+            tempgrid[i][j].diffuse();
+        }
+    }
+    for (let i = 1; i < r - 1; i++) {
+        for (let j = 1; j < c - 1; j++) {
+            tempgrid[1][0].advect();
+        }
+>>>>>>> refs/remotes/origin/main
     }
 
 
@@ -175,6 +201,10 @@ function draw() {
         }
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main
 
 // initialState();
 function mainloop() {
@@ -229,9 +259,21 @@ canvas.addEventListener('mousemove', (e) => {
     if (mouse.j > N - 1) {
         mouse.j = N - 2;
     }
+<<<<<<< HEAD
 
     meshGrid[IX(mouse.i, mouse.j)].ux = -1;
     meshGrid[IX(mouse.i, mouse.j)].uy = 0;
     meshGrid[IX(mouse.i, mouse.j)].rho = 1;
+=======
+    // 
+    for (let i = 0; i < N; i++) {
+        for (let i = 0; i < N*0.1; i++) {
+            mousex = idx.x + i;
+            mousey = idx.y + i;
+            grid[mousex][mousey].d0 = 0;
+
+        }
+    }
+>>>>>>> refs/remotes/origin/main
 
 });

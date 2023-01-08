@@ -154,7 +154,7 @@ function updateGrid() {
     }
 
     tempGrid = [...meshGrid];
-    
+
     for (let i = 0; i < size; i++) {
         meshGrid[i].stream();
     }
@@ -178,7 +178,7 @@ function draw() {
     }
 }
 
-initialState();
+// initialState();
 function mainloop() {
     updateGrid();
     draw();

@@ -9,7 +9,7 @@ canvas.height = dim;
 const N = 50;
 const size = N * N;
 const gridSpacing = dim / N;
-const viscosity = 1 / 4; 	// kinematic viscosity coefficient in natural units
+const viscosity = 1 / 5; 	// kinematic viscosity coefficient in natural units
 const omega = 1 / (3 * viscosity + 0.5);
 
 // velocity directions,

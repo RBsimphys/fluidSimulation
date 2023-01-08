@@ -152,6 +152,9 @@ function updateGrid() {
     for (let i = 0; i < size; i++) {
         meshGrid[i].collide();
     }
+
+    tempGrid = [...meshGrid];
+    
     for (let i = 0; i < size; i++) {
         meshGrid[i].stream();
     }

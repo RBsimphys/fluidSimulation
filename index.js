@@ -164,7 +164,7 @@ function draw() {
             if (meshGrid[IX(i, j)].isbound) {
                 ctx.fillStyle = `rgb(50, 50, 55)`;
             } else {
-                color = Math.floor(255 - 700 * speed);
+                color = Math.floor(255 - 1000 * speed);
                 ctx.fillStyle = `rgb(255, 255, ${color})`;
             }
             ctx.fillRect(i * gridSpacing, j * gridSpacing, gridSpacing, gridSpacing);
@@ -223,7 +223,7 @@ canvas.addEventListener('mousemove', (e) => {
         mouse.j = N - 2;
     }
 
-    meshGrid[IX(mouse.i, mouse.j)].ux = 0.1;
+    meshGrid[IX(mouse.i, mouse.j)].ux = 0.4;
     // meshGrid[IX(mouse.i, mouse.j)].uy = 10;
     // console.log(meshGrid[IX(mouse.i, mouse.j)].Ni[1], meshGrid[IX(mouse.i+1, mouse.j)].Ni[1]); 
 

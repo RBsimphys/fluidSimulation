@@ -9,7 +9,7 @@ canvas.height = dim;
 const N = 50;
 const size = N * N;
 const gridSpacing = dim / N;
-const viscosity = 1 / 5.5; 	// kinematic viscosity coefficient in natural units
+const viscosity = 1 / 4; 	// kinematic viscosity coefficient in natural units
 const omega = 1 / (3 * viscosity + 0.5);
 
 // velocity directions,
@@ -134,12 +134,11 @@ function setBoundary() {
 
 
 function initialState() {
-    // for (let i = 1; i < N-1; i++) {
-    //     for (let j = 1; j < 10; j++) {
-    //         meshGrid[IX(i, j)].ux = 12;
-    //     }
-    // }
-
+    for (let i = 3; i < N - 3; i++) {
+        for (let j = 1; j < 2; j++) {
+            meshGrid[IX(i, j)].uy = 0.3;
+        }
+    }
 }
 
 setBoundary();
@@ -166,7 +165,7 @@ function draw() {
             if (meshGrid[IX(i, j)].isbound) {
                 ctx.fillStyle = `rgb(50, 50, 55)`;
             } else {
-                color = Math.floor(255 - 1000 * Math.sqrt((meshGrid[IX(i, j)].ux *meshGrid[IX(i, j)].ux) +(meshGrid[IX(i, j)].uy *meshGrid[IX(i, j)].uy)));
+                color = Math.floor(255 - 700 * Math.sqrt((meshGrid[IX(i, j)].ux * meshGrid[IX(i, j)].ux) + (meshGrid[IX(i, j)].uy * meshGrid[IX(i, j)].uy)));
                 ctx.fillStyle = `rgb(255, 255, ${color})`;
             }
             ctx.fillRect(i * gridSpacing, j * gridSpacing, gridSpacing, gridSpacing);
@@ -174,8 +173,8 @@ function draw() {
     }
 }
 
-// initialState();
 function mainloop() {
+    initialState();
     updateGrid();
     draw();
     requestAnimationFrame(mainloop);
@@ -229,7 +228,7 @@ canvas.addEventListener('mousemove', (e) => {
         mouse.j = N - 2;
     }
 
-    meshGrid[IX(mouse.i, mouse.j)].ux = 0.5;
+    meshGrid[IX(mouse.i, mouse.j)].ux = 1;
     // meshGrid[IX(mouse.i, mouse.j)].uy = 10;
     // console.log(meshGrid[IX(mouse.i, mouse.j)].Ni[1], meshGrid[IX(mouse.i+1, mouse.j)].Ni[1]); 
 

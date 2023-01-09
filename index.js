@@ -128,7 +128,7 @@ function setBoundary() {
     }
 
     for (let i = Math.floor(N / 4); i < Math.floor(N / 2); i++) {
-        meshGrid[IX(i, N / 2)].isbound = true;
+        meshGrid[IX(i, N/5)].isbound = true;
     }
 }
 
@@ -179,10 +179,6 @@ function mainloop() {
     draw();
     requestAnimationFrame(mainloop);
 }
-
-// setInterval(initialState, 1000);
-// setInterval(mainloop, 1000);
-// setInterval(draw, 800);
 mainloop();
 
 function multiplyMatrices(a, b) {

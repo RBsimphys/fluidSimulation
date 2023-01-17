@@ -9,7 +9,7 @@ canvas.width = dim;
 canvas.height = dim;
 
 // flow grid setup
-const N = 50;
+const N = 60;
 const size = N * N;
 const gridSpacing = Math.floor(dim / N);
 const viscosity = 1 / 3; 	// kinematic viscosity coefficient in natural units
@@ -121,7 +121,7 @@ function setBoundary() {
     }
 
 
-    for (let j = Math.floor(N/5); j < Math.floor(N/5 +1); j++) {
+    for (let j = Math.floor(N / 5); j < Math.floor(N / 5 + 1); j++) {
         for (let i = Math.floor(N / 3 + 1); i < Math.floor(N / 3 + 10); i++) {
             meshGrid[IX(j, i)].isbound = true;
         }
@@ -135,7 +135,7 @@ function initialState() {
             meshGrid[IX(c, r)].isinlet = true;
 
 
-            let [x, y] = [0.4, 0];
+            let [x, y] = [0.7, 0];
 
             for (let i = 0; i < 9; i++) {
                 meshGrid[IX(c, r)].Ni[i] = (1 + (3 * dotMatrix(e[i], [x, y])) +
@@ -194,8 +194,8 @@ function draw() {
         for (let j = 0; j < N; j++) {
 
             let speed = Math.sqrt(Math.pow(meshGrid[IX(i, j)].ux, 2) + Math.pow(meshGrid[IX(i, j)].ux, 2));
-            let nSpeed = (speed - minU)/(maxU -minU);
-            let c = color(nSpeed); 
+            let nSpeed = (speed - minU) / (maxU - minU);
+            let c = color(nSpeed);
             if (meshGrid[IX(i, j)].isbound) {
                 ctx.fillStyle = `white`;
             }
@@ -210,13 +210,13 @@ function draw() {
 
 let colors = [];
 
-for (var i = 85; i < 360; i += 1) {
+for (let i = 340; i > 85; i--) {
     colors.push("hsla(" + i + ", 100%, 50%)");
 }
 
 let color = function (val) {
-    if(val <= 0.01) return colors[0]; 
-    var colorIndex = Math.round(val * (colors.length -1));
+    if (val <= 0.01) return colors[colors.length - 1];
+    var colorIndex = Math.round(val * (colors.length - 1));
     return colors[colorIndex];
 }
 

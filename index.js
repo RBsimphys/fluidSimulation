@@ -1,10 +1,5 @@
 'use strict';
-const value = document.querySelector("#viscosity")
-const input = document.querySelector("#viscosity_input")
 
-input.addEventListener("input", (event) => {
-    value.textContent = event.target.value
-})
 
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
@@ -56,10 +51,6 @@ class Cell {
             this.rho / 9];
         this.Neq;
 
-
-
-
-
     }
 
     get equilibrium() {
@@ -110,6 +101,7 @@ class Cell {
             this.ux += e[i][0] * n;
             this.uy += e[i][1] * n;
         });
+
         this.ux /= this.rho;
         this.uy /= this.rho;
     }
@@ -128,30 +120,29 @@ function setBoundary() {
         meshGrid[IX(i, 0)].isbound = true;
     }
 
-    for (let i = Math.floor(N / 4); i < Math.floor(N / 2); i++) {
-        meshGrid[IX(5, i)].isbound = true;
-    }
 
-    for (let i = Math.floor(N-20); i < Math.floor(N); i++) {
-        meshGrid[IX(5, i)].isbound = true;
+    for (let j = Math.floor(N/5); j < Math.floor(N/5 +1); j++) {
+        for (let i = Math.floor(N / 3 + 1); i < Math.floor(N / 3 + 10); i++) {
+            meshGrid[IX(j, i)].isbound = true;
+        }
     }
-    for (let i = 0; i < Math.floor(N / 1.5); i++) {
-        meshGrid[IX(N / 2, i)].isbound = true;
-    }
-
-
 }
 
 
 function initialState() {
-    for (let r = 1; r < N; r++) {
-        meshGrid[IX(1, r)].isinlet = true;
-        let [x, y] = [1, 0];
-        for (let i = 0; i < 9; i++) {
-            meshGrid[IX(1, r)].Ni[i] = (1 + (3 * dotMatrix(e[i], [x, y])) +
-                (9 / 2) * Math.pow(dotMatrix(e[i], [x, y]), 2) -
-                (3 / 2) * ((x * x) + (y * y))) * (meshGrid[IX(1, i)].rho * w[i]);
+    for (let c = 1; c < 2; c++) {
+        for (let r = 1; r < N; r++) {
+            meshGrid[IX(c, r)].isinlet = true;
 
+
+            let [x, y] = [0.4, 0];
+
+            for (let i = 0; i < 9; i++) {
+                meshGrid[IX(c, r)].Ni[i] = (1 + (3 * dotMatrix(e[i], [x, y])) +
+                    (9 / 2) * Math.pow(dotMatrix(e[i], [x, y]), 2) -
+                    (3 / 2) * ((x * x) + (y * y))) * (meshGrid[IX(1, i)].rho * w[i]);
+
+            }
         }
     }
 }
@@ -166,39 +157,50 @@ function updateGrid() {
         meshGrid[i].collide();
     }
 
+
     tempGrid = _.cloneDeep(meshGrid);
 
     for (let i = 0; i < size; i++) {
         meshGrid[i].stream();
     }
 
-    tempGrid = _.cloneDeep(meshGrid);
 
-    initialState();
 }
 
 function draw() {
+    // get min and max speed of 
+
+    let minUx = meshGrid.reduce(function (prev, curr) {
+        return prev < curr.ux ? prev : curr.ux;
+    });
+
+    let minUy = meshGrid.reduce(function (prev, curr) {
+        return prev < curr.uy ? prev : curr.uy;
+    });
+
+    let maxUx = meshGrid.reduce(function (prev, curr) {
+        return prev > curr.ux ? prev : curr.ux;
+    });
+
+    let maxUy = meshGrid.reduce(function (prev, curr) {
+        return prev > curr.uy ? prev : curr.uy;
+    });
+
+    let minU = Math.sqrt(Math.pow(minUx, 2) + Math.pow(minUy, 2));
+    let maxU = Math.sqrt(Math.pow(maxUx, 2) + Math.pow(maxUy, 2))
+
+
     for (let i = 0; i < N; i++) {
         for (let j = 0; j < N; j++) {
-            let color;
-            let speed = Math.sqrt((meshGrid[IX(i, j)].ux * meshGrid[IX(i, j)].ux) + (meshGrid[IX(i, j)].uy * meshGrid[IX(i, j)].uy));
+
+            let speed = Math.sqrt(Math.pow(meshGrid[IX(i, j)].ux, 2) + Math.pow(meshGrid[IX(i, j)].ux, 2));
+            let nSpeed = (speed - minU)/(maxU -minU);
+            let c = color(nSpeed); 
             if (meshGrid[IX(i, j)].isbound) {
-                ctx.fillStyle = `rgb(0, 0, 0)`;
-            } else if (meshGrid[IX(i, j)].isinlet) {
-                ctx.fillStyle = `rgb(10, 10, 0)`;
+                ctx.fillStyle = `white`;
             }
             else {
-                if (speed == 0) {
-                    ctx.fillStyle = `rgb(100, 255, 255)`;
-                }
-                else if(speed < 0.14){    
-                    color = Math.floor(255 - 1000 * speed);
-                    ctx.fillStyle = `rgb(${190 -color} ,${color} , ${255 + color})`;
-                }
-                else {
-                    color = Math.floor(255 - 1000 * speed);
-                    ctx.fillStyle = `rgb(${100 - color} ,${color} , ${255 - 1 / 3 * color})`;
-                }
+                ctx.fillStyle = c;
             }
             ctx.fillRect(i * gridSpacing, j * gridSpacing, gridSpacing, gridSpacing);
         }
@@ -206,7 +208,23 @@ function draw() {
     }
 }
 
+let colors = [];
+
+for (var i = 10; i < 160; i += 1) {
+    colors.push("hsla(" + i + ", 100%, 50%)");
+}
+
+let color = function (val) {
+    if(val <= 0.01) return colors[0]; 
+    var colorIndex = Math.round(val * (colors.length -1));
+    return colors[colorIndex];
+}
+
+
+
 function mainloop() {
+
+    initialState();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     updateGrid();
     draw();

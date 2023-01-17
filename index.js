@@ -210,7 +210,7 @@ function draw() {
 
 let colors = [];
 
-for (var i = 10; i < 160; i += 1) {
+for (var i = 85; i < 360; i += 1) {
     colors.push("hsla(" + i + ", 100%, 50%)");
 }
 

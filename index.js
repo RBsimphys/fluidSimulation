@@ -1,19 +1,21 @@
 'use strict';
 
 
-const canvas = document.getElementById("canvas1");
-const ctx = canvas.getContext("2d");
+const canv = document.getElementById("canvas1");
+const ctx = canv.getContext("2d");
 // canvas setup 
 const dim = 400;
-canvas.width = dim;
-canvas.height = dim;
-
+canv.width = dim;
+canv.height = dim;
+let ux0 = 0.1;
+let uy0 = 0;
 // flow grid setup
-const N = 50;
+const timeStep = 1;
+const N = 80;
 const size = N * N;
 const gridSpacing = Math.floor(dim / N);
-const viscosity = 0.8; 	// kinematic viscosity coefficient in natural units
-const omega = 1 / (3 * viscosity + 0.5);
+const viscosity = 0.02; 	// kinematic viscosity coefficient in natural units
+const omega = 1 / (3 * mu + 0.5);
 
 // velocity directions,
 const e = [
@@ -32,8 +34,9 @@ const w = [
 
 let meshGrid = new Array(size);
 let tempGrid;
+
 class Cell {
-    constructor(index, rho, ux, uy, isbound, isinlet, isoutlet) {
+    constructor(index, rho, ux, uy, isbound, isinlet, isoutlet, isperiodic) {
         this.i = index;
         this.isbound = isbound;
         this.isinlet = isinlet;
@@ -49,22 +52,21 @@ class Cell {
             this.rho / 9, this.rho / 9, this.rho / 9, this.rho / 9,
             this.rho / 9, this.rho / 9, this.rho / 9, this.rho / 9,
             this.rho / 9];
-        this.Neq;
 
-    }
 
-    get equilibrium() {
-        let n = [];
+        this.Neq = [];
         for (let i = 0; i < 9; i++) {
-            n[i] = (1 + (3 * dotMatrix(e[i], [this.ux, this.uy])) +
-                (9 / 2) * Math.pow(dotMatrix(e[i], [this.ux, this.uy]), 2) -
-                (3 / 2) * ((this.ux * this.ux) + (this.uy * this.uy))) * (this.rho * w[i]);
+            this.Neq[i] = (1 + (3 * dotMatrix(e[i], [ux0, uy0])) +
+                (9 / 2) * Math.pow(dotMatrix(e[i], [ux0, uy0]), 2) -
+                (3 / 2) * ((ux0 * ux0) + (uy0 * uy0))) * (this.rho * w[i]);
         }
-        return n;
+
     }
 
     stream() {
+
         if (this.isbound) return;
+
         let Nth = this.i - N, Est = this.i + 1, Sth = this.i + N, Wst = this.i - 1;
         let NE = Nth + 1, SE = Sth + 1, SW = Sth - 1, NW = Nth - 1;
 
@@ -80,22 +82,15 @@ class Cell {
         meshGrid[this.i].Ni[7] = tempGrid[NE].isbound ? tempGrid[this.i].Ni[5] : tempGrid[NE].Ni[7];
         meshGrid[this.i].Ni[8] = tempGrid[SE].isbound ? tempGrid[this.i].Ni[6] : tempGrid[SE].Ni[8];
 
+
     }
 
     collide() {
 
         if (this.isbound) return;
 
-        this.Neq = this.equilibrium;
-
-        for (let i = 0; i < 9; i++) {
-            this.Ni[i] += omega * (this.Neq[i] - this.Ni[i]);
-        }
-
         // get new macroscopic variables based on relaxation 
         this.rho = sumMatrix(this.Ni);
-        this.ux = 0;
-        this.uy = 0;
 
         this.Ni.forEach((n, i) => {
             this.ux += e[i][0] * n;
@@ -104,11 +99,16 @@ class Cell {
 
         this.ux /= this.rho;
         this.uy /= this.rho;
+
+        for (let i = 0; i < 9; i++) {
+            this.Ni[i] += omega * (this.Neq[i] - this.Ni[i]);
+        }
+
     }
 
 }
 for (let i = 0; i < size; i++) {
-    meshGrid[i] = new Cell(i, 1, 0, 0, false, false);
+    meshGrid[i] = new Cell(i, 1, ux0, 0, false);
 }
 
 
@@ -121,42 +121,24 @@ function setBoundary() {
     }
 
 
-    for (let j = Math.floor(N / 5); j < Math.floor(N / 5 + 1); j++) {
-        for (let i = Math.floor(N / 3 + 1); i < Math.floor(N / 3 + 10); i++) {
-            meshGrid[IX(j, i)].isbound = true;
+    for (let j = Math.floor(N / 2); j < Math.floor(N / 2 + 1); j++) {
+        for (let i = Math.floor(N / 3); i < Math.floor(N / 3 + 20); i++) {
+            meshGrid[IX(i, j)].isbound = true;
         }
     }
+
+
 }
 
 
-function initialState() {
-    for (let c = 1; c < 2; c++) {
-        for (let r = 1; r < N; r++) {
-            meshGrid[IX(c, r)].isinlet = true;
-
-
-            let [x, y] = [0.3, 0.2];
-
-            for (let i = 0; i < 9; i++) {
-                meshGrid[IX(c, r)].Ni[i] = (1 + (3 * dotMatrix(e[i], [x, y])) +
-                    (9 / 2) * Math.pow(dotMatrix(e[i], [x, y]), 2) -
-                    (3 / 2) * ((x * x) + (y * y))) * (meshGrid[IX(1, i)].rho * w[i]);
-
-            }
-        }
-    }
-}
 
 setBoundary();
 
-
-tempGrid = _.cloneDeep(meshGrid);
 
 function updateGrid() {
     for (let i = 0; i < size; i++) {
         meshGrid[i].collide();
     }
-
 
     tempGrid = _.cloneDeep(meshGrid);
 
@@ -170,38 +152,24 @@ function updateGrid() {
 function draw() {
     // get min and max speed of 
 
-    let minUx = meshGrid.reduce(function (prev, curr) {
-        return prev < curr.ux ? prev : curr.ux;
+    let Umag = meshGrid.map(function (e) {
+        return Math.sqrt(Math.pow(e.ux, 2) + Math.pow(e.uy, 2));
     });
 
-    let minUy = meshGrid.reduce(function (prev, curr) {
-        return prev < curr.uy ? prev : curr.uy;
-    });
-
-    let maxUx = meshGrid.reduce(function (prev, curr) {
-        return prev > curr.ux ? prev : curr.ux;
-    });
-
-    let maxUy = meshGrid.reduce(function (prev, curr) {
-        return prev > curr.uy ? prev : curr.uy;
-    });
-
-    let minU = Math.sqrt(Math.pow(minUx, 2) + Math.pow(minUy, 2));
-    let maxU = Math.sqrt(Math.pow(maxUx, 2) + Math.pow(maxUy, 2))
-
+    let maxUmag = Math.max(...Umag);
 
     for (let i = 0; i < N; i++) {
         for (let j = 0; j < N; j++) {
+            // let speed = Math.sqrt(Math.pow(meshGrid[IX(i, j)].ux, 2) + Math.pow(meshGrid[IX(i, j)].uy, 2));
+            // let norm_speed = speed / maxUmag;
 
-            // let speed = Math.sqrt(Math.pow(meshGrid[IX(i, j)].ux, 2) + Math.pow(meshGrid[IX(i, j)].ux, 2));
-            let speed = meshGrid[IX(i, j)].ux;
-            let nSpeed = (speed - minUx) / (maxUx - minUx);
-            let c = color(nSpeed);
-            if (meshGrid[IX(i, j)].isbound) {
-                ctx.fillStyle = `white`;
+            // let c = color(norm_speed);
+
+            if (meshGrid[IX(i, j)].isbound || meshGrid[IX(i, j)].isinlet) {
+                ctx.fillStyle = `black`;
             }
             else {
-                ctx.fillStyle = c;
+                ctx.fillStyle = `rgb(${255*meshGrid[IX(i,j)].ux},55,0)`;
             }
             ctx.fillRect(i * gridSpacing, j * gridSpacing, gridSpacing, gridSpacing);
         }
@@ -211,12 +179,12 @@ function draw() {
 
 let colors = [];
 
-for (let i = 350; i >= 100; i--) {
-    colors.push("hsla(" + i + ", 100%, 50%)");
+for (let i = 10; i <= 200; i += 1) {
+    colors.push("hsla(" + i + ", 100%, 50%, 100%)");
 }
 
 let color = function (val) {
-    if (val <= 0.1) return colors[200];
+    // if (val <= 0.1) return colors[0];
     var colorIndex = Math.round(val * (colors.length - 1));
     return colors[colorIndex];
 }
@@ -224,13 +192,12 @@ let color = function (val) {
 
 
 function mainloop() {
-
-    initialState();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
     updateGrid();
     draw();
     requestAnimationFrame(mainloop);
 }
+// mainloop(); 
 mainloop();
 
 function multiplyMatrices(a, b) {
@@ -255,7 +222,7 @@ function IX(i, j) {
 
 
 
-canvas.addEventListener('mousemove', (e) => {
+canv.addEventListener('mousemove', (e) => {
     e.preventDefault();
 
     let mouse = {

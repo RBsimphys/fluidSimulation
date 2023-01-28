@@ -3,12 +3,12 @@ const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 800;
-canvas.height = 150;
+canvas.height = 200;
 
-var pxPerSquare = 5;
+var N = 5;
 
-var xdim = canvas.width / pxPerSquare;
-var ydim = canvas.height / pxPerSquare;
+var xn = canvas.width / N;
+var yn = canvas.height / N;
 
 // grid set up =====================================================================================
 
@@ -28,9 +28,9 @@ const w = [
 const findex = [5, 6, 7, 8, 1, 2, 3, 4];
 const Re = 100;
 
-let obsRadius = 2;                          // obstacale properties 
-let obsXpos = Math.round(xdim * 0.1);
-let obsYpos = Math.round(ydim * 0.4);
+let obsRadius = 5;                          // obstacale properties 
+let obsXpos = Math.round(xn * 0.1);
+let obsYpos = Math.round(yn * 0.4);
 
 // let obsRadius2 = 10;                          // obstacale properties 
 // let obsXpos2 = Math.round(xdim*0.2);
@@ -62,12 +62,12 @@ const Cell = (rho, ux, uy, isObstacle) => {
 }
 
 
-grid = new Array(xdim * ydim);
+grid = new Array(xn * yn);
 
 
-for (let i = 0; i < xdim; i++) {
-    for (let j = 0; j < ydim; j++) {
-        grid[i + j * xdim] = Cell(1, 0, 0, false);
+for (let i = 0; i < xn; i++) {
+    for (let j = 0; j < yn; j++) {
+        grid[i + j * xn] = Cell(1, 0, 0, false);
     }
 }
 
@@ -100,15 +100,15 @@ setObstacle(obsRadius, obsXpos, obsYpos, 5, 8);
 
 
 
-for (let i = 0; i < xdim; i++) {
-    for (let j = 0; j < ydim; j++) {
+for (let i = 0; i < xn; i++) {
+    for (let j = 0; j < yn; j++) {
         grid[IX(i, j)].fi = relax(ux0, uy0, rho);
     }
 }
 
 function collide() {
-    for (let i = 0; i < xdim; i++) {
-        for (let j = 0; j < ydim; j++) {
+    for (let i = 0; i < xn; i++) {
+        for (let j = 0; j < yn; j++) {
             let index = IX(i, j);		// array index for this lattice site
             grid[index].rho = sumMatrix(grid[index].fi);
             grid[index].ux = 0;
@@ -128,34 +128,34 @@ function collide() {
 
 function stream() {
 
-    for (var y = ydim - 2; y > 0; y--) {
-        for (var x = 1; x < xdim - 1; x++) {
+    for (var y = yn - 2; y > 0; y--) {
+        for (var x = 1; x < xn - 1; x++) {
             grid[IX(x, y)].fi[1] = grid[IX(x, y - 1)].fi[1];
             grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
         }
     }
-    for (var y = ydim - 2; y > 0; y--) {
-        for (var x = xdim - 2; x > 0; x--) {
+    for (var y = yn - 2; y > 0; y--) {
+        for (var x = xn - 2; x > 0; x--) {
             grid[IX(x, y)].fi[3] = grid[IX(x - 1, y)].fi[3];
             grid[IX(x, y)].fi[2] = grid[IX(x - 1, y - 1)].fi[2];
         }
     }
-    for (var y = 1; y < ydim - 1; y++) {
-        for (var x = xdim - 2; x > 0; x--) {
+    for (var y = 1; y < yn - 1; y++) {
+        for (var x = xn - 2; x > 0; x--) {
             grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
             grid[IX(x, y)].fi[4] = grid[IX(x - 1, y + 1)].fi[4];
         }
     }
-    for (var y = 1; y < ydim - 1; y++) {
-        for (var x = 1; x < xdim - 1; x++) {
+    for (var y = 1; y < yn - 1; y++) {
+        for (var x = 1; x < xn - 1; x++) {
             grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];			// move the west-moving particles
             grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];		// and the southwest-moving particles
         }
     }
-    for (var y = 1; y < ydim - 1; y++) {				// Now handle bounce-back from barriers
-        for (var x = 1; x < xdim - 1; x++) {
-            if (grid[x + y * xdim].isObstacle) {
-                var index = x + y * xdim;
+    for (var y = 1; y < yn - 1; y++) {				// Now handle bounce-back from barriers
+        for (var x = 1; x < xn - 1; x++) {
+            if (grid[x + y * xn].isObstacle) {
+                var index = x + y * xn;
                 grid[IX(x + 1, y)].fi[2] = grid[index].fi[8];
                 grid[IX(x - 1, y)].fi[8] = grid[index].fi[2];
                 grid[IX(x, y + 1)].fi[1] = grid[index].fi[5];
@@ -197,9 +197,9 @@ function draw() {
     });
     let maxUmag = Math.max(...Umag);
 
-    for (var y = 0; y < ydim; y++) {
-        for (var x = 0; x < xdim; x++) {
-            let index = x + y * xdim;
+    for (var y = 0; y < yn; y++) {
+        for (var x = 0; x < xn; x++) {
+            let index = x + y * xn;
 
             let speed = Math.sqrt(Math.pow(grid[index].ux, 2) + Math.pow(grid[index].uy, 2));
 
@@ -211,10 +211,10 @@ function draw() {
 
             ctx.fillStyle = c;
             if (grid[index].isObstacle) {
-                ctx.fillStyle = 'black';
+                ctx.fillStyle = 'rgba(0, 0, 0, 1)';
             }
 
-            ctx.fillRect(x * pxPerSquare, y * pxPerSquare, xdim, ydim);
+            ctx.fillRect(x * N, y * N, xn, yn);
         }
 
     }
@@ -246,15 +246,15 @@ function sumMatrix(a) {
 }
 
 function IX(i, j) {
-    return i + xdim * j;
+    return i + xn * j;
 }
 
 
 canvas.addEventListener('mousemove', (e) => {
     e.preventDefault();
     let mouse = {
-        i: Math.floor(e.offsetX / pxPerSquare),
-        j: Math.floor(e.offsetY / pxPerSquare),
+        i: Math.floor(e.offsetX / N),
+        j: Math.floor(e.offsetY / N),
     };
 
     grid[IX(mouse.i, mouse.j)].isObstacle = true;

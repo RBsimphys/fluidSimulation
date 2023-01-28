@@ -3,7 +3,7 @@ const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 800;
-canvas.height = 250;
+canvas.height = 150;
 
 var pxPerSquare = 5;
 
@@ -28,7 +28,7 @@ const w = [
 const findex = [5, 6, 7, 8, 1, 2, 3, 4];
 const Re = 100;
 
-let obsRadius = 5;                          // obstacale properties 
+let obsRadius = 2;                          // obstacale properties 
 let obsXpos = Math.round(xdim * 0.1);
 let obsYpos = Math.round(ydim * 0.4);
 
@@ -93,7 +93,7 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle) {
 
 
 
-setObstacle(obsRadius, obsXpos, obsYpos, 5, 7);
+setObstacle(obsRadius, obsXpos, obsYpos, 5, 8);
 
 // setObstacle(obsRadius2, obsXpos2, obsYpos2);
 

@@ -1,11 +1,11 @@
-// canvas set up
+// canvas set up ===================================================================================
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800;
-canvas.height = 200;
+canvas.width = 600;
+canvas.height = 160;
 
-var N = 5;
+var N = 8;
 
 var xn = canvas.width / N;
 var yn = canvas.height / N;
@@ -14,10 +14,11 @@ var yn = canvas.height / N;
 
 // velocity directions,
 const e = [
-    [0, 0],                                   // N0
+    [0, 0],                                   // 0
     [0, 1], [1, 1], [1, 0], [1, -1],          // N1, NE2, E3, SE4
     [0, -1], [-1, -1], [-1, 0], [-1, 1]       // S5, SW6, W7, NW8     
 ];
+
 // weights 
 const w = [
     4 / 9,                                    // N0
@@ -25,29 +26,27 @@ const w = [
     1 / 9, 1 / 36, 1 / 9, 1 / 36              // S5, SW6, W7, NW8
 ];
 
-const findex = [5, 6, 7, 8, 1, 2, 3, 4];
-const Re = 100;
-
-let obsRadius = 5;                          // obstacale properties 
-let obsXpos = Math.round(xn * 0.1);
-let obsYpos = Math.round(yn * 0.4);
-
-// let obsRadius2 = 10;                          // obstacale properties 
-// let obsXpos2 = Math.round(xdim*0.2);
-// let obsYpos2 = Math.round(ydim*0.5);
-
 
 const deltaT = 10;                             // time step
 let ux0 = 0.2;                                // initial x velocity 
 let uy0 = 0;                                  // initial y velocity 
 let rho = 1;                                  // initial density 
-const mu = 0.02;	                          // viscosity
+const mu = 0.01;	                          // viscosity
 const omega = 1 / (3 * mu + 0.5);
 
-const Cell = (rho, ux, uy, isObstacle) => {
+
+const obsRadius = 4;
+const obsXpos = xn * 0.1;
+const obsYpos = yn * 0.5;
+const startAngle = 0;
+const endAngle = Math.PI * 2;
+
+const Cell = (i, j, rho, ux, uy, isObstacle) => {
     let fi = new Array(9);
     let feq = new Array(9);
     let state = {
+        i,
+        j,
         rho,
         ux,
         uy,
@@ -67,7 +66,7 @@ grid = new Array(xn * yn);
 
 for (let i = 0; i < xn; i++) {
     for (let j = 0; j < yn; j++) {
-        grid[i + j * xn] = Cell(1, 0, 0, false);
+        grid[IX(i, j)] = Cell(i, j, 1, 0, 0, false);
     }
 }
 
@@ -83,28 +82,26 @@ function relax(ux, uy, rho) {
     }
     return f;
 }
+
+
 function setObstacle(radius, xpos, ypos, startAngle, endAngle) {
     for (let angle = startAngle; angle < endAngle; angle += 0.01) {
-        let x = xpos + radius * Math.cos(angle);
-        let y = ypos + radius * Math.sin(angle);
-        grid[IX(Math.round(x), Math.round(y))].isObstacle = true;
+        for (let i = 0; i < radius; i++) {
+            let x = xpos + i * Math.cos(angle);
+            let y = ypos + i * Math.sin(angle);
+            grid[IX(Math.round(x), Math.round(y))].isObstacle = true;
+        }
     }
 }
 
-
-
-setObstacle(obsRadius, obsXpos, obsYpos, 5, 8);
-
-// setObstacle(obsRadius2, obsXpos2, obsYpos2);
-
-
-
+setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle);
 
 for (let i = 0; i < xn; i++) {
     for (let j = 0; j < yn; j++) {
         grid[IX(i, j)].fi = relax(ux0, uy0, rho);
     }
 }
+
 
 function collide() {
     for (let i = 0; i < xn; i++) {
@@ -126,92 +123,113 @@ function collide() {
     }
 }
 
-function stream() {
 
-    for (var y = yn - 2; y > 0; y--) {
-        for (var x = 1; x < xn - 1; x++) {
-            grid[IX(x, y)].fi[1] = grid[IX(x, y - 1)].fi[1];
-            grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
-        }
-    }
-    for (var y = yn - 2; y > 0; y--) {
-        for (var x = xn - 2; x > 0; x--) {
-            grid[IX(x, y)].fi[3] = grid[IX(x - 1, y)].fi[3];
-            grid[IX(x, y)].fi[2] = grid[IX(x - 1, y - 1)].fi[2];
-        }
-    }
-    for (var y = 1; y < yn - 1; y++) {
-        for (var x = xn - 2; x > 0; x--) {
-            grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
-            grid[IX(x, y)].fi[4] = grid[IX(x - 1, y + 1)].fi[4];
-        }
-    }
-    for (var y = 1; y < yn - 1; y++) {
-        for (var x = 1; x < xn - 1; x++) {
-            grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];			// move the west-moving particles
-            grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];		// and the southwest-moving particles
-        }
-    }
-    for (var y = 1; y < yn - 1; y++) {				// Now handle bounce-back from barriers
-        for (var x = 1; x < xn - 1; x++) {
-            if (grid[x + y * xn].isObstacle) {
-                var index = x + y * xn;
-                grid[IX(x + 1, y)].fi[2] = grid[index].fi[8];
-                grid[IX(x - 1, y)].fi[8] = grid[index].fi[2];
-                grid[IX(x, y + 1)].fi[1] = grid[index].fi[5];
-                grid[IX(x, y - 1)].fi[5] = grid[index].fi[1];
-                grid[IX(x + 1, y + 1)].fi[2] = grid[index].fi[6];
-                grid[IX(x - 1, y + 1)].fi[8] = grid[index].fi[4];
-                grid[IX(x + 1, y - 1)].fi[4] = grid[index].fi[8];
-                grid[IX(x - 1, y - 1)].fi[6] = grid[index].fi[2];
-                // Keep track of stuff needed to plot force vector:
+
+let find = [0, 5, 6, 7, 8, 1, 2, 3, 4];
+function stream() {
+    for (let x = 2; x < xn - 2; x++) {
+        for (let y = 2; y < yn - 2; y++) {
+            for (let n = 1; n < 9; n++) {
+                let posx = x - e[n][0];
+                let posy = y - e[n][1];
+                grid[IX(x, y)].fi[n] = tempGrid[IX(posx, posy)].fi[n];
+
+                if (grid[IX(x, y)].isObstacle) {
+                    grid[IX(posx, posy)].fi[n] = tempGrid[IX(x, y)].fi[find[n]];
+                }
             }
+
         }
     }
+
 
 }
+
+//     for (var y = 1; y < yn - 1; y++) {
+//         for (var x = 1; x < xn - 1; x++) {
+//             grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];			// move the west-moving particles
+//             grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];		// and the southwest-moving particles
+//         }
+//     }
+//     for (var y = yn - 2; y > 0; y--) {
+//         for (var x = 1; x < xn - 1; x++) {
+//             grid[IX(x, y)].fi[1] = grid[IX(x, y - 1)].fi[1];
+//             grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
+//         }
+//     }
+//     for (var y = yn - 2; y > 0; y--) {
+//         for (var x = xn - 2; x > 0; x--) {
+//             grid[IX(x, y)].fi[3] = grid[IX(x - 1, y)].fi[3];
+//             grid[IX(x, y)].fi[2] = grid[IX(x - 1, y - 1)].fi[2];
+//         }
+//     }
+//     for (var y = 1; y < yn - 1; y++) {
+//         for (var x = xn - 2; x > 0; x--) {
+//             grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
+//             grid[IX(x, y)].fi[4] = grid[IX(x - 1, y + 1)].fi[4];
+//         }
+//     }
+// }
+
+function computeboundries() {
+    for (var y = 1; y < yn - 1; y++) {				// Now handle bounce-back from barriers
+        for (var x = 1; x < xn - 1; x++) {
+
+            // grid[IX(x, y + 1)].fi[1] = grid[index].fi[5];
+            // grid[IX(x + 1, y + 1)].fi[2] = grid[index].fi[6];
+            // grid[IX(x + 1, y)].fi[2] = grid[index].fi[8];
+            // grid[IX(x - 1, y)].fi[8] = grid[index].fi[2];
+            // grid[IX(x + 1, y - 1)].fi[4] = grid[index].fi[8];
+            // grid[IX(x - 1, y + 1)].fi[8] = grid[index].fi[4];
+
+            // grid[IX(x, y - 1)].fi[5] = grid[index].fi[1];
+            // grid[IX(x - 1, y - 1)].fi[6] = grid[index].fi[2];
+        }
+    }
+}
+
+
+
 
 
 let colors = [];
 
-for (let i = 0; i <= 150; i += 0.01) {
-    let density = Math.log(i + 2) / Math.log(100);
-    let hue = Math.round(density * 360);
-    let sat = Math.round(density * 80);
-    let light = Math.round(density * 30 + 35);
+for (let i = 0; i <= 100; i += 0.1) {
+    let density = Math.log(i + 1) / Math.log(90);
+    let hue = Math.round(density * 380);
+    let sat = Math.round(density * 200);
+    let light = Math.round(density + 35);
     colors.push(`hsl(${hue} ${sat}% ${light}%)`);
 }
 
-let color = function (val, Re_t) {
+let color = function (val) {
     let density = Math.log(val + 1) / Math.log(100);
     let colorIndex = Math.round(density * (colors.length - 1));
-
     return colors[colorIndex];
 
 }
 
 function draw() {
-    let Umag = grid.map(function (e) {
-        return e.ux;
-        // return Math.sqrt(Math.pow(e.ux, 2) + Math.pow(e.uy, 2));
-    });
-    let maxUmag = Math.max(...Umag);
+    let vorticity = [];
+    for (let i = 1; i < xn - 1; i++) {
+        for (let j = 1; j < yn - 1; j++) {
+            vorticity.push(curl(i, j));
+        }
+    }
 
-    for (var y = 0; y < yn; y++) {
-        for (var x = 0; x < xn; x++) {
+    let maxVort = Math.max(...vorticity);
+    let minVort = Math.min(...vorticity);
+
+    for (var y = 1; y < yn - 1; y++) {
+        for (var x = 1; x < xn - 1; x++) {
             let index = x + y * xn;
 
-            let speed = Math.sqrt(Math.pow(grid[index].ux, 2) + Math.pow(grid[index].uy, 2));
-
-            let Re_t = grid[index].ux * obsXpos / mu;
-
-            let norm_speed = grid[index].ux / maxUmag;
-
-            let c = color(norm_speed, Re_t);
+            let norm_speed = (curl(x, y) - minVort) / (maxVort - minVort);
+            let c = color(norm_speed);
 
             ctx.fillStyle = c;
             if (grid[index].isObstacle) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+                ctx.fillStyle = 'rgba(0, 0, 55, 60%)';
             }
 
             ctx.fillRect(x * N, y * N, xn, yn);
@@ -220,13 +238,13 @@ function draw() {
     }
 }
 
-
 let tempGrid = _.cloneDeep(grid);
 function simulate() {
-    for (let i = 0; i < deltaT; i++) {
+    for (let i = 1; i < deltaT; i++) {
         collide();
-        // tempGrid = _.cloneDeep(grid);
+        tempGrid = _.cloneDeep(grid);
         stream();
+        computeboundries();
     }
 
     draw();
@@ -249,8 +267,11 @@ function IX(i, j) {
     return i + xn * j;
 }
 
+function curl(i, j) {
+    return (grid[IX(i, j + 1)].ux - grid[IX(i, j - 1)].ux) - (grid[IX(i - 1, j)].uy - grid[IX(i - 1, j)].uy);
+}
 
-canvas.addEventListener('mousemove', (e) => {
+canvas.addEventListener('click', (e) => {
     e.preventDefault();
     let mouse = {
         i: Math.floor(e.offsetX / N),
@@ -258,6 +279,6 @@ canvas.addEventListener('mousemove', (e) => {
     };
 
     grid[IX(mouse.i, mouse.j)].isObstacle = true;
-    // console.log(meshGrid[IX(mouse.i, mouse.j)].ux, meshGrid[IX(mouse.i, mouse.j)].uy);
+    // console.log(grid[IX(mouse.i, mouse.j)].fi[plot]);
 
 });

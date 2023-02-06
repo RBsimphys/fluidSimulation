@@ -22,7 +22,7 @@ for (let i = 0; i < plotOptionButtons.length; i++) {
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800;
+canvas.width = 600;
 canvas.height = 200;
 
 var N = 5;

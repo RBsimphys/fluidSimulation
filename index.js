@@ -182,9 +182,10 @@ function stream() {
 
 }
 // original color map made based on principles by Dr. Kristen Thyng https://www.youtube.com/watch?v=o9KxYxROSgM&ab_channel=Plotly
-let colorU = chroma.scale('YlGn');
-let colorVorticity = chroma.scale('RdYlBu');
-let colorRho =   chroma.scale(['green', 'red','blue', 'red']);
+let colorUx = chroma.scale('YlGn');
+let colorUy = chroma.scale('OrRd').padding([0.2, 0]);
+let colorVorticity = chroma.cubehelix().hue([1,0]);
+let colorRho =  chroma.cubehelix().rotations(0.5);
 
 function draw() {
     let vorticity = [];
@@ -221,11 +222,11 @@ function draw() {
                     c = colorRho((grid[index].rho - minRho) / (maxRho - minRho))
                     break;
                 case 2:
-                    c = colorU((grid[index].ux - minUx) / (maxUx - minUx))
+                    c = colorUx((grid[index].ux - minUx) / (maxUx - minUx))
                     break;
                 case 3:
 
-                    c = colorU((grid[index].uy - minUy) / (maxUy - minUy))
+                    c = colorUy((grid[index].uy - minUy) / (maxUy - minUy))
                     break;
                 default:
                     let norm_speed = (curl(x, y) - minVort) / (maxVort - minVort);

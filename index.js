@@ -1,8 +1,28 @@
+// plot option 
+const plotOptionButtons = document.querySelectorAll('input[name="plotOption"]');
+let plotSelection;
+for (let i = 0; i < plotOptionButtons.length; i++) {
+    plotOptionButtons[i].addEventListener('change', function (event) {
+        if (event.target.checked) {
+            var plotOption = event.target.value;
+            if (plotOption === 'density') {
+                plotSelection = 1;
+            } else if (plotOption === 'Ux') {
+                plotSelection = 2;
+            } else if (plotOption === 'Uy') {
+                plotSelection = 3;
+            } else if (plotOption === 'vorticity') {
+                plotSelection = 4;
+            }
+        }
+    });
+}
+
 // canvas set up ===================================================================================
 const canvas = document.getElementById("canvas1");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 500;
+canvas.width = 800;
 canvas.height = 200;
 
 var N = 5;
@@ -35,7 +55,7 @@ const mu = 0.02;	                          // viscosity
 const omega = 1 / (3 * mu + 0.5);
 
 
-const obsRadius = 6;
+const obsRadius = 8;
 const obsXpos = xn * 0.14;
 const obsYpos = yn * 0.5;
 const startAngle = 0;
@@ -104,11 +124,11 @@ for (let i = 0; i < xn; i++) {
 
 
 
-
+// collision step 
 function collide() {
     for (let i = 0; i < xn; i++) {
         for (let j = 0; j < yn; j++) {
-            let index = IX(i, j);	
+            let index = IX(i, j);
             grid[index].rho = sumMatrix(grid[index].fi);
             grid[index].ux = 0;
             grid[index].uy = 0;
@@ -124,11 +144,10 @@ function collide() {
     }
 }
 
-
-let find = [0, 5, 6, 7, 8, 1, 2, 3, 4];
+//  in-place stream function, with bounce back boundary condition  
+let fbounce = [0, 5, 6, 7, 8, 1, 2, 3, 4];
 function stream() {
-
-    // N NE E SE
+    // N NE E SE S        
     for (let x = xn - 2; x > 0; x--) {
         for (let y = yn - 2; y > 0; y--) {
             grid[IX(x, y)].fi[1] = grid[IX(x, y - 1)].fi[1];
@@ -136,17 +155,14 @@ function stream() {
             grid[IX(x, y)].fi[3] = grid[IX(x - 1, y)].fi[3];
             grid[IX(x, y)].fi[4] = grid[IX(x - 1, y + 1)].fi[4];
         }
-    }
-    // S
-    for (let y = 1; y < yn - 1; y++) {
-        for (let x = xn - 2; x > 0; x--) {
-        
+        for (let y = 1; y < yn - 1; y++) {
             grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
         }
+
     }
     // SW W NW
     for (let x = 2; x < xn - 2; x++) {
-        for (let y = yn - 2; y > 2; y--) {    
+        for (let y = yn - 2; y > 2; y--) {
             grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];
             grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];
             grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
@@ -157,7 +173,7 @@ function stream() {
         for (let y = 1; y < yn - 1; y++) {
             if (grid[IX(x, y)].isObstacle) {
                 for (let n = 1; n < 9; n++) {
-                    grid[IX(x, y)].fi[n] = grid[IX(x,y)].fi[find[n]];
+                    grid[IX(x, y)].fi[n] = grid[IX(x, y)].fi[fbounce[n]];
                 }
             }
         }
@@ -165,28 +181,10 @@ function stream() {
 
 
 }
-var colorMap = [];
-
-for (var i = 0; i < 256; i++) {
-    var red, green, blue;
-    var fraction = i / 256.0;
-    blue = Math.pow(fraction, 0.9) ;
-    green = Math.pow(fraction, 0.9);
-    red = fraction;
-    red = Math.floor(255 * red);
-    green = Math.floor(255 * green);
-    blue = Math.floor(255 * blue);
-    colorMap[i] = `rgb(${red}, ${green}, ${blue})`;
-}
-
-// Function to get color for a given fluid density
-function color(density) {
-    var index = Math.floor(density * 255);
-    index = Math.max(0, Math.min(255, index));
-    return colorMap[index];
-}
-
-
+// original color map made based on principles by Dr. Kristen Thyng https://www.youtube.com/watch?v=o9KxYxROSgM&ab_channel=Plotly
+let colorU = chroma.scale('YlGn');
+let colorVorticity = chroma.scale('RdYlBu');
+let colorRho =   chroma.scale(['green', 'red','blue', 'red']);
 
 function draw() {
     let vorticity = [];
@@ -199,13 +197,41 @@ function draw() {
     let maxVort = Math.max(...vorticity);
     let minVort = Math.min(...vorticity);
 
+    let UxArray = grid.map(function (e) { return e.ux });
+    let maxUx = Math.max(...UxArray);
+    let minUx = Math.min(...UxArray);
+
+    let UyArray = grid.map(function (e) { return e.uy });
+
+    let maxUy = Math.max(...UyArray);
+    let minUy = Math.min(...UyArray);
+
+
+    let rhoArray = grid.map(function (e) { return e.rho });
+
+    let maxRho = Math.max(...rhoArray);
+    let minRho = Math.min(...rhoArray);
+
+    let c;
     for (var y = 1; y < yn - 1; y++) {
         for (var x = 1; x < xn - 1; x++) {
             let index = x + y * xn;
+            switch (plotSelection) {
+                case 1:
+                    c = colorRho((grid[index].rho - minRho) / (maxRho - minRho))
+                    break;
+                case 2:
+                    c = colorU((grid[index].ux - minUx) / (maxUx - minUx))
+                    break;
+                case 3:
 
-            let norm_speed = (curl(x, y) - minVort) / (maxVort - minVort);
-            let c = color(norm_speed);
-            text = `${Math.round(grid[index].fi[1] * 100)} `
+                    c = colorU((grid[index].uy - minUy) / (maxUy - minUy))
+                    break;
+                default:
+                    let norm_speed = (curl(x, y) - minVort) / (maxVort - minVort);
+                    c = colorVorticity(norm_speed);
+                    break;
+            }
             // let c = color(grid[IX(x, y)].fi[1]);
             ctx.fillStyle = c;
             if (grid[index].isObstacle) {
@@ -213,12 +239,6 @@ function draw() {
             }
 
             ctx.fillRect(x * N, y * N, N, N);
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = 'rgba(255, 0, 0, 60%)';
-
-            // ctx.font = "20px Arial";
-            // ctx.fillText(text, x * N + N / 2, y * N + N / 2);
         }
 
     }

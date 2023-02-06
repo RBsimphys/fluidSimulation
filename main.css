@@ -1,9 +1,30 @@
-*{
-    margin: 0; 
+* {
+    margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-canvas{ 
-    
+canvas {}
+
+fieldset{
+    border: none;
+    display: flex;
+    padding: 10px;
+}
+form input[type="radio"] {
+    display: none;
+}
+
+form label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+form input[type="radio"]:checked+label {
+    background-color: #555555;
+    color: white;
 }

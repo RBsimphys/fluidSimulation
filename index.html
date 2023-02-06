@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">    
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,12 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="main.css">
-    <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"></script>
 </head>
 
 <body>
     <p>D2Q9 Lattice Boltzeman Simulation</p>
     <canvas id="canvas1"></canvas>
+    <form>
+        <fieldset>
+            <legend>Plot:</legend>
+            <input type="radio" id="plotDensity" name="plotOption" value="density">
+            <label for="plotDensity">ρ</label>
+            <input type="radio" id="plotUx" name="plotOption" value="Ux">
+            <label for="plotUx">Ux</label>
+            <input type="radio" id="plotUy" name="plotOption" value="Uy">
+            <label for="plotUy">Uy</label>
+            <input type="radio" id="plotVorticity" name="plotOption" value="vorticity" checked>
+            <label for="plotVorticity">ω</label>
+        </fieldset>
+
+    </form>
 
 </body>
 <script src="index.js"></script>

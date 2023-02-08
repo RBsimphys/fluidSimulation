@@ -11,22 +11,33 @@
 </head>
 
 <body>
-    <p>D2Q9 Lattice Boltzeman Simulation</p>
-    <canvas id="canvas1"></canvas>
-    <form>
-        <fieldset>
-            <legend>Plot:</legend>
-            <input type="radio" id="plotDensity" name="plotOption" value="density">
-            <label for="plotDensity">ρ</label>
-            <input type="radio" id="plotUx" name="plotOption" value="Ux">
-            <label for="plotUx">Ux</label>
-            <input type="radio" id="plotUy" name="plotOption" value="Uy">
-            <label for="plotUy">Uy</label>
-            <input type="radio" id="plotVorticity" name="plotOption" value="vorticity" checked>
-            <label for="plotVorticity">ω</label>
-        </fieldset>
+    <div id="simulation">
+        <figure id="grid">
+            <figcaption class="figureCaption">Lattice boltzeman fluid simulation</figcaption>
+            <canvas id="simulationCanvas"></canvas>
+        </figure>
 
-    </form>
+        <form>
+            <fieldset>
+                <input type="radio" id="plotVorticity" name="plotOption" value="vorticity" checked>
+                <label for="plotVorticity">ω</label>
+                <input type="radio" id="plotDensity" name="plotOption" value="density">
+                <label for="plotDensity">ρ</label>
+                <input type="radio" id="plotUx" name="plotOption" value="Ux">
+                <label for="plotUx">Ux</label>
+                <input type="radio" id="plotUy" name="plotOption" value="Uy">
+                <label for="plotUy">Uy</label>
+            </fieldset>
+        </form>
+
+        <figure id="plotContainer">
+            <figcaption id="profilePlotCaption" class="figureCaption"></figcaption>
+            <canvas id="velocityGraph"></canvas>
+            <label for="yPos" class="inputLabel">X-position:</label>
+            <input type="range" min="0" step="1" value="50" id="xPos">
+        </figure>
+
+    </div>
 
 </body>
 <script src="index.js"></script>

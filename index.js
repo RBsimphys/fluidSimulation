@@ -1,36 +1,16 @@
-// plot option 
-const plotOptionButtons = document.querySelectorAll('input[name="plotOption"]');
-let plotSelection;
-for (let i = 0; i < plotOptionButtons.length; i++) {
-    plotOptionButtons[i].addEventListener('change', function (event) {
-        if (event.target.checked) {
-            var plotOption = event.target.value;
-            if (plotOption === 'density') {
-                plotSelection = 1;
-            } else if (plotOption === 'Ux') {
-                plotSelection = 2;
-            } else if (plotOption === 'Uy') {
-                plotSelection = 3;
-            } else if (plotOption === 'vorticity') {
-                plotSelection = 4;
-            }
-        }
-    });
-}
-
-// canvas set up ===================================================================================
-const canvas = document.getElementById("canvas1");
+// ===================================================================================
+// canvas set up 
+const canvas = document.getElementById("simulationCanvas");
 const ctx = canvas.getContext("2d");
-
-canvas.width = 600;
-canvas.height = 200;
-
-var N = 5;
+canvas.width = 840;
+canvas.height = 540;
+var N = 10;
 
 var xn = canvas.width / N;
 var yn = canvas.height / N;
 
-// grid set up =====================================================================================
+// ======================================================================================
+// Grid set up
 
 // velocity directions,
 const e = [
@@ -39,7 +19,7 @@ const e = [
     [0, -1], [-1, -1], [-1, 0], [-1, 1]       // S5, SW6, W7, NW8     
 ];
 
-// weights m
+// weights 
 const w = [
     4 / 9,                                    // N0
     1 / 9, 1 / 36, 1 / 9, 1 / 36,             // N1, NE2, E3, SE4
@@ -55,8 +35,8 @@ const mu = 0.02;	                          // viscosity
 const omega = 1 / (3 * mu + 0.5);
 
 
-const obsRadius = 8;
-const obsXpos = xn * 0.14;
+const obsRadius = 5;
+const obsXpos = xn * 0.1;
 const obsYpos = yn * 0.5;
 const startAngle = 0;
 const endAngle = Math.PI * 2;
@@ -64,15 +44,15 @@ const endAngle = Math.PI * 2;
 const Cell = (i, j, rho, ux, uy, isObstacle) => {
     let fi = new Array(9);
     let feq = new Array(9);
+    let vorticity;
     let state = {
-        i,
-        j,
         rho,
         ux,
         uy,
         fi,
         feq,
         isObstacle,
+        vorticity,
     }
     return Object.assign(
         {},
@@ -91,8 +71,10 @@ for (let i = 0; i < xn; i++) {
 }
 
 
+// ======================================================================================
+// Physics stuff 
 
-function relax(ux, uy, rho) {
+function getEquilibrium(ux, uy, rho) {
     let f = [];
     for (let n = 0; n < 9; n++) {
         let a = 3 * (e[n][0] * ux + e[n][1] * uy);
@@ -118,7 +100,7 @@ setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle);
 
 for (let i = 0; i < xn; i++) {
     for (let j = 0; j < yn; j++) {
-        grid[IX(i, j)].fi = relax(ux0, uy0, rho);
+        grid[IX(i, j)].fi = getEquilibrium(ux0, uy0, rho);
     }
 }
 
@@ -132,11 +114,13 @@ function collide() {
             grid[index].rho = sumMatrix(grid[index].fi);
             grid[index].ux = 0;
             grid[index].uy = 0;
+
             for (let n = 0; n < 9; n++) {
                 grid[index].ux += (e[n][0] * grid[index].fi[n]) / grid[index].rho;
                 grid[index].uy += (e[n][1] * grid[index].fi[n]) / grid[index].rho;
             }
-            let feq = relax(grid[index].ux, grid[index].uy, grid[index].rho);
+
+            let feq = getEquilibrium(grid[index].ux, grid[index].uy, grid[index].rho);
             for (let n = 0; n < 9; n++) {
                 grid[index].fi[n] += omega * (feq[n] - grid[index].fi[n]);
             }
@@ -158,19 +142,15 @@ function stream() {
         for (let y = 1; y < yn - 1; y++) {
             grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
         }
-
     }
-    // SW W NW
-    for (let x = 2; x < xn - 2; x++) {
-        for (let y = yn - 2; y > 2; y--) {
+
+    for (let x = 1; x < xn - 2; x++) {
+        for (let y = yn - 2; y > 1; y--) {
+            // SW W NW
             grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];
             grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];
             grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
-        }
-    }
-    // handle obstacles 
-    for (let x = 1; x < xn - 1; x++) {
-        for (let y = 1; y < yn - 1; y++) {
+            // handle obstacles 
             if (grid[IX(x, y)].isObstacle) {
                 for (let n = 1; n < 9; n++) {
                     grid[IX(x, y)].fi[n] = grid[IX(x, y)].fi[fbounce[n]];
@@ -178,15 +158,23 @@ function stream() {
             }
         }
     }
-
-
 }
-// original color map made based on principles by Dr. Kristen Thyng https://www.youtube.com/watch?v=o9KxYxROSgM&ab_channel=Plotly
-let colorUx = chroma.scale('YlGn');
-let colorUy = chroma.scale('OrRd').padding([0.2, 0]);
-let colorVorticity = chroma.cubehelix().hue([1,0]);
-let colorRho =  chroma.cubehelix().rotations(0.5);
 
+// ======================================================================================
+// draw stuff 
+
+// plot options 
+const plotOptionButtons = document.querySelectorAll('input[name="plotOption"]');
+let plotSelection = 4;
+
+// chroma js color map
+let colorUx = chroma.scale('YlGn');
+let colorUy = chroma.cubehelix().hue([1, 0]);
+let colorVorticity = chroma.scale('OrRd').padding([0.2, 0]);
+let colorRho = chroma.cubehelix().rotations(0.5);
+
+
+// draw fluid simulation 
 function draw() {
     let vorticity = [];
     for (let i = 1; i < xn - 1; i++) {
@@ -245,19 +233,112 @@ function draw() {
     }
 }
 
+// graph profiles 
+const chart = document.getElementById("velocityGraph");
+const gctx = chart.getContext("2d");
+
+const graphCaption = document.getElementById("profilePlotCaption");
+const xPos = document.getElementById("xPos");
+
+xPos.max = toString(xn); 
+
+chart.width = 400;
+chart.height = 300;
+
+function graph(posx) {
+
+    let vorticity = [];
+    for (let i = 1; i < xn - 1; i++) {
+        for (let j = 1; j < yn - 1; j++) {
+            vorticity.push(curl(i, j));
+        }
+    }
+
+    let maxVort = Math.max(...vorticity);
+    let minVort = Math.min(...vorticity);
+
+    let UxArray = grid.map(function (e) { return e.ux });
+    let maxUx = Math.max(...UxArray);
+    let minUx = Math.min(...UxArray);
+
+    let UyArray = grid.map(function (e) { return e.uy });
+
+    let maxUy = Math.max(...UyArray);
+    let minUy = Math.min(...UyArray);
+
+
+    let rhoArray = grid.map(function (e) { return e.rho });
+
+    let maxRho = Math.max(...rhoArray);
+    let minRho = Math.min(...rhoArray);
+
+    let data = [];
+
+    switch (plotSelection) {
+        case 1:
+            for (let i = 0; i < yn-1; i++) {
+                data.push((grid[IX(posx, i)].rho - minRho) / (maxRho - minRho));
+            }
+            graphCaption.textContent = `Density profile @ x = ${posx} (normalized)`;
+            break;
+        case 2:
+            for (let i = 0; i < yn-1; i++) {
+                data.push((grid[IX(posx, i)].ux - minUx) / (maxUx - minUx));
+            }
+
+            graphCaption.textContent = `X velocity profile @ x = ${posx} (normalized)`;
+            break;
+        case 3:
+            for (let i = 0; i < yn-1; i++) {
+                data.push(((grid[IX(posx, i)].uy - minUy) / (maxUy - minUy)));
+            }
+
+            graphCaption.textContent = `Y velocity profile @ x = ${posx} (normalized)`;
+            break;
+        default:
+            for (let i = 2; i < yn - 2; i++) {
+                let norm_speed = (curl(posx, i) - minVort) / (maxVort - minVort);
+                data.push(norm_speed);
+            }
+            graphCaption.textContent = `Vorticity profile @ x = ${posx} (normalized)`;
+            break;
+    }
+    gctx.beginPath();
+    gctx.moveTo(chart.width * data[0], 0);
+    for (let i = 1; i < data.length; i++) {
+        gctx.lineTo(chart.width * data[i], chart.height * i / data.length);
+    }
+    gctx.lineTo(0, chart.width);
+
+
+    gctx.stroke();
+
+
+    gctx.closePath();
+}
+
+
+
+// ======================================================================================
+// Main Loop 
 function simulate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    gctx.clearRect(0, 0, chart.width, chart.height);
+
     for (let i = 1; i < deltaT; i++) {
         collide();
         stream();
     }
 
     draw();
+    graph(Number(xPos.value));
     requestAnimationFrame(simulate);
 }
 
 simulate();
 
-
+// =============================================================
+//Accessory functions
 
 function dotMatrix(a, b) {
     return a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
@@ -274,6 +355,8 @@ function IX(i, j) {
 function curl(i, j) {
     return (grid[IX(i, j + 1)].ux - grid[IX(i, j - 1)].ux) - (grid[IX(i - 1, j)].uy - grid[IX(i - 1, j)].uy);
 }
+// =====================================================================================
+// EVENT LISTENRES 
 
 canvas.addEventListener('mousemove', (e) => {
     e.preventDefault();
@@ -283,8 +366,30 @@ canvas.addEventListener('mousemove', (e) => {
     };
 
     grid[IX(mouse.i, mouse.j)].isObstacle = true;
-
-    // console.log(mouse.i, mouse.j);
+    console.log(mouse.i, mouse.j);
     // console.log(grid[IX(mouse.i, mouse.j)].fi[plot]);
 
 });
+
+
+for (let i = 0; i < plotOptionButtons.length; i++) {
+    plotOptionButtons[i].addEventListener('change', function (event) {
+        if (event.target.checked) {
+            let plotOption = event.target.value;
+            switch (plotOption) {
+                case "density":
+                    plotSelection = 1;
+                    break;
+                case "Ux":
+                    plotSelection = 2;
+                    break;
+                case "Uy":
+                    plotSelection = 3;
+                    break;
+                default:
+                    plotSelection = 4;
+                    break;
+            }
+        }
+    });
+}

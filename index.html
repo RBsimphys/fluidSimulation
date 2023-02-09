@@ -27,7 +27,6 @@
                 <label for="plotUx">Ux</label>
                 <input type="radio" id="plotUy" name="plotOption" value="Uy">
                 <label for="plotUy">Uy</label>
-                
                 <input type="submit" value="reset" />
             </fieldset>
             
@@ -35,11 +34,12 @@
 
         <figure id="plotContainer">
             <figcaption id="profilePlotCaption" class="figureCaption"></figcaption>
-            <canvas id="velocityGraph"></canvas>
-            <label for="yPos" class="inputLabel">X-position:</label>
-            <input type="range" min="0" step="1" value="50" id="xPos">
+            <canvas id="plot"></canvas>
+            <p id = "yLabel">Position (y/L)</p>
+            <p id = "xLabel">Normalized Velocity (U/Umax)</p>
         </figure>
-
+        <label for="xPos" class="inputLabel">X-position:</label>
+        <input type="range" min="0" step="1" value="50" id="xPos">
     </div>
 
 </body>

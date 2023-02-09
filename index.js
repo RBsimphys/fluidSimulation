@@ -2,9 +2,9 @@
 // canvas set up 
 const canvas = document.getElementById("simulationCanvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 840;
-canvas.height = 540;
-var N = 10;
+canvas.width = 660;
+canvas.height = 240;
+var N = 6;
 
 var xn = canvas.width / N;
 var yn = canvas.height / N;
@@ -142,7 +142,7 @@ function stream() {
         for (let y = 1; y < yn - 1; y++) {
             grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
         }
-    }
+    }   
 
     for (let x = 1; x < xn - 2; x++) {
         for (let y = yn - 2; y > 1; y--) {
@@ -234,16 +234,23 @@ function draw() {
 }
 
 // graph profiles 
-const chart = document.getElementById("velocityGraph");
+const chart = document.getElementById("plot");
 const gctx = chart.getContext("2d");
 
 const graphCaption = document.getElementById("profilePlotCaption");
 const xPos = document.getElementById("xPos");
+const graphXaxis = document.getElementById("xLabel"); 
 
-xPos.max = toString(xn); 
+xPos.max = toString(xn);
 
-chart.width = 400;
-chart.height = 300;
+let plotWidth = 400;
+let plotHeight = 200;
+let buffer = 30;
+let chartWidth = plotWidth + buffer;
+let chartHeight = plotHeight + buffer;
+chart.width = chartWidth;
+chart.height = chartHeight;
+
 
 function graph(posx) {
 
@@ -276,45 +283,71 @@ function graph(posx) {
 
     switch (plotSelection) {
         case 1:
-            for (let i = 0; i < yn-1; i++) {
+            for (let i = 0; i < yn - 1; i++) {
                 data.push((grid[IX(posx, i)].rho - minRho) / (maxRho - minRho));
             }
-            graphCaption.textContent = `Density profile @ x = ${posx} (normalized)`;
+            graphCaption.textContent = `Density profile @ x = ${posx}`;
+            graphXaxis.textContent = "Normalized Density (ρ/ρmax)";
             break;
         case 2:
-            for (let i = 0; i < yn-1; i++) {
+            for (let i = 0; i < yn - 1; i++) {
                 data.push((grid[IX(posx, i)].ux - minUx) / (maxUx - minUx));
             }
 
-            graphCaption.textContent = `X velocity profile @ x = ${posx} (normalized)`;
+            graphCaption.textContent = `X velocity profile @ x = ${posx}`;
+            graphXaxis.textContent = "Normalized X-Velocity (U/Umax)";
             break;
         case 3:
-            for (let i = 0; i < yn-1; i++) {
+            for (let i = 0; i < yn - 1; i++) {
                 data.push(((grid[IX(posx, i)].uy - minUy) / (maxUy - minUy)));
             }
 
-            graphCaption.textContent = `Y velocity profile @ x = ${posx} (normalized)`;
+            graphCaption.textContent = `Y-velocity profile @ x = ${posx}`;
+            graphXaxis.textContent = "Normalized Y-Velocity (U/Umax)"; 
             break;
         default:
             for (let i = 2; i < yn - 2; i++) {
                 let norm_speed = (curl(posx, i) - minVort) / (maxVort - minVort);
                 data.push(norm_speed);
             }
-            graphCaption.textContent = `Vorticity profile @ x = ${posx} (normalized)`;
+            graphCaption.textContent = `Vorticity profile @ x = ${posx}`;
+            graphXaxis.textContent = "Normalized Vorticity (ω/ωmax)";
             break;
     }
+
+    // graph data 
     gctx.beginPath();
-    gctx.moveTo(chart.width * data[0], 0);
-    for (let i = 1; i < data.length; i++) {
-        gctx.lineTo(chart.width * data[i], chart.height * i / data.length);
+    gctx.moveTo(0, 0);
+    for (let i = 0; i < data.length; i++) {
+        gctx.lineTo(plotWidth * data[i], plotHeight * i / data.length);
     }
-    gctx.lineTo(0, chart.width);
+    gctx.lineTo(0, plotHeight);
+    gctx.stroke();
 
-
+    // draw graph borders 
+    gctx.beginPath();
+    gctx.moveTo(0, 0);
+    gctx.lineTo(0, plotHeight);
+    gctx.lineTo(plotWidth, plotHeight);
+    gctx.lineTo(plotWidth, 0);
+    gctx.lineTo(0, 0);
     gctx.stroke();
 
 
-    gctx.closePath();
+    // draw tick marks 
+    for (let i = 0; i <= 1; i += 0.1) {
+        gctx.beginPath();
+        gctx.moveTo(plotWidth * i, plotHeight);
+        gctx.lineTo(plotWidth * i, chartHeight * 0.9);
+        gctx.closePath();
+        gctx.stroke();
+    }
+
+    gctx.font='normal 20px Times New Roman';
+    gctx.fillText("1", plotWidth, chartHeight);
+    gctx.fillText("1", plotWidth, chartHeight);
+    gctx.fillText("0", 0, chartHeight);
+
 }
 
 

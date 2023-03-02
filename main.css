@@ -30,9 +30,8 @@ body {
 
 /* fluid simulation canvas ------------------------*/
 #titleCaption {
-    font-size: 2.3rem;
+    font-size: 2rem;
     text-decoration: underline;
-
 }
 
 #xPosContainer {
@@ -71,26 +70,26 @@ input[type="range"] {
     top: 16%;
 }
 
-#playpausebtn {
-    margin: 5px;
-    margin-bottom: 10px;
-    border: none;
-    height: 20px;
-    width: 30px;
-    font-size: 20px;
-    background-color: white;
+#fluidButtons {
+    display: flex;
+    align-items: center;
+    justify-content: baseline;
 }
 
-
-#replay{
-    margin: 5px;
-    margin-bottom: 10px;
+#fluidButtons>* {
     border: none;
-    height: 20px;
-    width: 30px;
-    font-size: 20px;
     background-color: white;
+    padding: 10px;
 }
+
+#fluidButtons>*:hover {
+    background-color: #d9d9c7;
+}
+
+#playIcon {
+    display: none;
+}
+
 /* PLOTS */
 .charts {
     display: flex;

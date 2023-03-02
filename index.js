@@ -486,7 +486,6 @@ let countInRange = function (array, h, l) {
     let count = 0;
     for (let i = 0; i < array.length; i++) {
         if (array[i] > h) return count;
-
         if (array[i] <= h && array[i] >= l) count++;
     }
 
@@ -500,25 +499,22 @@ let countInRange = function (array, h, l) {
 initialize();
 
 function simulate() {
-    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height)
-    ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
+    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
 
-    let r = Math.random() * 255;
-    let g = Math.random() * 255;
-    let b = Math.random() * 255;
+    ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
 
     switch (plotSelection) {
         case "Density":
-            gctx.strokeStyle = `rgba(160, 121, 75, 20%)`;
+            gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 121, 75, 20%)`;
             break;
         case "Ux":
-            gctx.strokeStyle = `rgba(241, 109, 75, 20%)`;
+            gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
             break;
         case "Uy":
-            gctx.strokeStyle = `rgba(141, 124, 100, 20%)`;
+            gctx.strokeStyle = `rgba(${141 * xPos.value / NX}, 124, 100, 20%)`;
             break;
         default:
-            gctx.strokeStyle = `rgba(127, 164, 209, 20%)`;
+            gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 164, 209, 20%)`;
             break;
     }
     if (!trackHistory.checked) {
@@ -621,20 +617,46 @@ for (let i = 0; i < plotOptionButtons.length; i++) {
     plotOptionButtons[i].addEventListener('change', function (event) {
         if (event.target.checked) {
             plotSelection = event.target.value;
+            gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
             setColorLegend();
         }
     });
 }
 
 const playpausebtn = document.getElementById("playpausebtn");
-playpausebtn.addEventListener('click', updateButton);
+const pauseIcon = document.getElementById("pauseIcon");
+const playIcon = document.getElementById("playIcon");
 
-function updateButton() {
+playpausebtn.addEventListener('click', updatePausePlayButtons);
+
+function updatePausePlayButtons() {
     if (animating === false) {
-        playpausebtn.textContent = "||";
+        pauseIcon.style.display = "block";
+        playIcon.style.display = "none"
         animating = true;
     } else {
-        playpausebtn.textContent = "▶";
+        pauseIcon.style.display = "none";
+        playIcon.style.display = "block"
         animating = false;
     }
+}
+
+const replay = document.getElementById("replay");
+
+replay.addEventListener('click', resetSimulation);
+
+function resetSimulation() {
+
+
+    for (let i = 0; i < NX; i++) {
+        for (let j = 0; j < NY; j++) {
+            grid[IX(i, j)].fi = setEquilibrium(ux0, uy0, rho);
+            grid[IX(i, j)].isObstacle = false;
+        }
+    }
+    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle);
+
+    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
+
+    gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
 }

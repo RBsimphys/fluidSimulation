@@ -14,6 +14,7 @@
 body {
     font-family: 'Times New Roman', serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -23,22 +24,15 @@ body {
 /* FLUID SIMULATION */
 #simulation {
     display: flex;
-    justify-content: center;
     flex-direction: column;
-    width: 50%;
+    justify-content: center;
+    width: 70%;
 }
 
 /* fluid simulation canvas ------------------------*/
 #titleCaption {
-    font-size: 2rem;
+    font-size: 2em;
     text-decoration: underline;
-}
-
-#xPosContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 #xPos {
@@ -51,23 +45,25 @@ input[type="range"] {
 }
 
 #fluidPlotContainer {
-    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
     margin-bottom: 2%;
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 2;
 }
 
 #fluidPlot {
-    text-align: center;
     position: relative;
 }
 
 #colorMapLegend {
     position: absolute;
     left: 100%;
-    top: 16%;
+    top: 15.5%;
 }
 
 #fluidButtons {
@@ -77,6 +73,8 @@ input[type="range"] {
 }
 
 #fluidButtons>* {
+    display: flex;
+    align-items: center;
     border: none;
     background-color: white;
     padding: 10px;
@@ -90,40 +88,40 @@ input[type="range"] {
     display: none;
 }
 
-/* PLOTS */
-.charts {
+#playbackSpeed {
     display: flex;
-    flex-direction: column;
-    row-gap: 20px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    font-weight: bolder;
+    color: var(--form-control-color);
 }
 
-/* profile plot---------------------------------------------- */
-#profilePlotContainer {
+/* PLOTS -----------------------*/
+#chartContainer {
     display: flex;
     justify-content: center;
-    font-size: 1.2rem;
+    align-items: center;
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 2;
 }
 
-.plot {
+.chart {
     position: relative;
     text-align: center;
-    margin-left: 5%;
+    margin-left: 30px;
 }
 
-#profilePlotCaption {
-    font-size: 1.6rem;
-}
-
-#yLabel {
+.yLabel {
     position: absolute;
     top: 45%;
-    left: -18%;
+    left: -15%;
     transform: rotate(270deg);
 }
 
 
-/* histogram plot  */
-#histogramPlot {}
 
 /* macro properties selection---------- */
 fieldset {
@@ -135,10 +133,16 @@ input[type="radio"] {
 }
 
 
-#profilePlotForm {
+#plotForm {
     display: flex;
     flex-direction: column;
+    margin-top: 2rem;
     gap: 20px;
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 1;
+    width: 600px;
+    justify-content: center;
+    align-self: center;
 }
 
 .macroLabel {
@@ -159,8 +163,13 @@ input[type="radio"]:checked+.macroLabel {
     color: white;
 }
 
-#plotSelectionForm {
+#selectionFormContainer{
+    display: flex;  
+    flex-direction: row;
+}
+#plotSelectionForm, #shapeSelectionForm {
     display: inline-flex;
+    width: fit-content;
     border: 1px solid black;
 }
 

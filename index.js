@@ -26,16 +26,17 @@ const w = [
 ];
 
 // obstacle measurements 
-const obsRadius = NY / 9;
-const obsXpos = NX * 0.1;
-const obsYpos = NY * 0.5;
+let obsRadius = NY * 0.12;
+let obsXpos = NX * 0.1;
+let obsYpos = NY * 0.5;
 const startAngle = 0;
 const endAngle = Math.PI * 2;
 
 
 const Re = document.getElementById("reynoldsInput");
 const reynoldsDisplay = document.getElementById("reynoldsDisplay");
-const deltaT = 5;                             //time step
+let deltaT = 6;                             //time step
+let timeStep = 0;
 let ux0 = 0.2;                                //initial x velocity 
 let uy0 = 0;                                  //initial y velocity 
 let rho = 1;                                  //initial density 
@@ -72,6 +73,48 @@ for (let i = 0; i < NX; i++) {
 }
 
 
+function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape) {
+    clearObstacles();
+    switch (shape) {
+        case "line":
+            for (let x = 1; x <= 2; x++) {
+                for (let y = ypos - radius; y <= ypos + radius; y++) {
+                    grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
+                }
+            }
+            break;
+        case "circle":
+            for (let angle = startAngle; angle < endAngle; angle += 0.01) {
+                for (let i = 0; i < radius; i++) {
+                    let x = xpos + i * Math.cos(angle);
+                    let y = ypos + i * Math.sin(angle);
+                    grid[IX(Math.round(x), Math.round(y))].isObstacle = true;
+                }
+            };
+            break;
+        // case "snake":
+
+        //     // for (let x = 1; x <= 40; x++) {
+        //     //     for (let y = 0; y < NY/2 - 8; y++) {
+        //     //         grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
+        //     //     }
+        //     // }
+
+        //     // for (let x = 1; x <= 100; x++) {
+        //     //     for (let y = NY - 1; y >= NY/2 + 8 ; y--) {
+        //     //         grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
+        //     //     }
+        //     }
+        //     break;
+        default:
+        // code block
+    }
+
+
+}
+
+setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+
 
 // ======================================================================================
 // PHYSICS STUFF
@@ -87,21 +130,6 @@ function setEquilibrium(ux, uy, rho) {
     return f;
 }
 
-
-
-
-
-function setObstacle(radius, xpos, ypos, startAngle, endAngle) {
-    for (let angle = startAngle; angle < endAngle; angle += 0.01) {
-        for (let i = 0; i < radius; i++) {
-            let x = xpos + i * Math.cos(angle);
-            let y = ypos + i * Math.sin(angle);
-            grid[IX(Math.round(x), Math.round(y))].isObstacle = true;
-        }
-    }
-}
-
-setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle);
 
 function initialize() {
     for (let i = 0; i < NX; i++) {
@@ -165,6 +193,13 @@ function stream() {
         }
     }
 }
+
+// ==================================================================================================
+//set obstacles 
+
+const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
+let shapeSelection = "circle";
+
 
 // ======================================================================================
 // DRAW STUFF  
@@ -233,9 +268,14 @@ function draw(posx) {
         }
 
     }
+
+    ctx.font = "10px Times New Roman";
+    ctx.fillStyle = "rgba(0,0,0,70%)";
+    ctx.fillText(`Δt: ${deltaT}; step: ${timeStep}`, 10, simulationCanvas.height - 10);
 }
 
 // color legend for fluid simulation 
+
 const colorLegend = document.getElementById("colorMapLegend");
 const clctx = colorLegend.getContext("2d");
 colorLegend.width = 50;
@@ -304,9 +344,9 @@ const xPos = document.getElementById("xPos");
 const graphXaxis = document.getElementById("xLabel");
 const plotSelectionLegend = document.getElementById("plotSelectionLegend");
 
-let trackHistory = document.getElementById("trackHistory");
+const trackHistory = document.getElementById("trackHistory");
 
-let plotWidth = 400;
+let plotWidth = 350;
 let plotHeight = 200;
 let buffer = 30;
 let chartWidth = plotWidth + buffer;
@@ -398,10 +438,10 @@ function plotProfile(posx) {
 const histogramPlot = document.getElementById("histogramPlot");
 const hctx = histogramPlot.getContext("2d");
 
-let histogramWidth = 400;
-let histogramHeight = 100;
-histogramPlot.width = histogramWidth;
-histogramPlot.height = histogramHeight;
+let histogramWidth = 200;
+let histogramHeight = 200;
+histogramPlot.width = histogramWidth + buffer;
+histogramPlot.height = histogramHeight + buffer;
 
 const histogramCaption = document.getElementById("histogramCaption");
 const xHistogramLabel = document.getElementById("xHistogramLabel");
@@ -434,7 +474,7 @@ function plotHistogram() {
                     data.push((grid[IX(i, j)].uy));
                 }
             }
-            histogramCaption.textContent = `Y-velocity profile histogram`;
+            histogramCaption.textContent = `Y-velocity histogram`;
             xHistogramLabel.textContent = "Y-Velocity";
 
 
@@ -445,7 +485,7 @@ function plotHistogram() {
                     data.push((curl(i, j)));
                 }
             }
-            histogramCaption.textContent = `Vorticity profile histogram`;
+            histogramCaption.textContent = `Vorticity histogram`;
             xHistogramLabel.textContent = "Vorticity";
             break;
     }
@@ -457,7 +497,7 @@ function plotHistogram() {
 
     let norm_data = data.map(x => ((x - min) / (max - min))).sort((a, b) => a - b);
     // let norm_data = [0, 0.1, 0.1, 0.2, 0.3, 0.4, 0.6];
-    let numBins = 100;
+    let numBins = 1000;
     let bins = [];
     let range = [];
 
@@ -475,20 +515,25 @@ function plotHistogram() {
     hctx.moveTo(0, 0);
     hctx.lineTo(0, histogramHeight);
     hctx.lineTo(histogramWidth, histogramHeight);
-    hctx.lineTo(histogramWidth, 0);
-    hctx.lineTo(0, 0);
     hctx.stroke();
 
 
-}
+    // draw tick marks 
+    // for (let i = 0; i <= 1; i += 0.1) {
+    //     hctx.beginPath();
+    //     hctx.moveTo(histogramWidth * i, histogramHeight);
+    //     hctx.lineTo(histogramWidth * i, histogramPlot.height * 0.9);
+    //     hctx.closePath();
+    //     hctx.stroke();
+    // }
 
+}
 let countInRange = function (array, h, l) {
     let count = 0;
     for (let i = 0; i < array.length; i++) {
         if (array[i] > h) return count;
         if (array[i] <= h && array[i] >= l) count++;
     }
-
     return count;
 }
 
@@ -498,27 +543,33 @@ let countInRange = function (array, h, l) {
 
 initialize();
 
+
 function simulate() {
-    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
-
     ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
-
+    let c = 160;
     switch (plotSelection) {
         case "Density":
             gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 121, 75, 20%)`;
+            hctx.fillStyle = `rgba(160, 121, 75, 1%)`;
             break;
         case "Ux":
             gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
+            hctx.fillStyle = `rgba(241, 109, 75, 1%)`;
             break;
         case "Uy":
-            gctx.strokeStyle = `rgba(${141 * xPos.value / NX}, 124, 100, 20%)`;
+            gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
+            hctx.fillStyle = `rgba(143, 124, 100, 1%)`;
             break;
         default:
             gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 164, 209, 20%)`;
+            hctx.fillStyle = `rgba(127, 164, 229, 1%)`;
             break;
     }
     if (!trackHistory.checked) {
         gctx.strokeStyle = "rgb(0,0,0)";
+        hctx.fillStyle = "rgb(0,0,0)";
+
+        hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
         gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
     }
 
@@ -530,6 +581,7 @@ function simulate() {
         for (let i = 1; i < deltaT; i++) {
             collide();
             stream();
+            timeStep += i;
         }
     }
     draw(Number(xPos.value));
@@ -599,14 +651,15 @@ function getExtremum() {
 // =====================================================================================
 // EVENT LISTENRES 
 
-simulationCanvas.addEventListener('mousemove', (e) => {
+simulationCanvas.addEventListener('click', (e) => {
     e.preventDefault();
-    let mouse = {
-        i: Math.floor(e.offsetX / N),
-        j: Math.floor(e.offsetY / N),
-    };
+    clearObstacles();
+    let x = Math.floor(e.offsetX / N);
+    let y = Math.floor(e.offsetY / N);
+    // obsXpos = mouse.i;
+    // obsYpos = mouse.j;
+    setObstacle(obsRadius, x - obsRadius, y - obsRadius, startAngle, endAngle, shapeSelection);
 
-    grid[IX(mouse.i, mouse.j)].isObstacle = true;
     // console.log(mouse.i, mouse.j);
     // console.log(grid[IX(mouse.i, mouse.j)].fi[plot]);
 
@@ -618,7 +671,22 @@ for (let i = 0; i < plotOptionButtons.length; i++) {
         if (event.target.checked) {
             plotSelection = event.target.value;
             gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+            hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
             setColorLegend();
+        }
+    });
+}
+
+
+
+for (let i = 0; i < shapeOptionButtons.length; i++) {
+    shapeOptionButtons[i].addEventListener('change', function (event) {
+        if (event.target.checked) {
+            shapeSelection = event.target.value;
+            resetSimulation();
+            setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection);
+            gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+            hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
         }
     });
 }
@@ -645,18 +713,50 @@ const replay = document.getElementById("replay");
 
 replay.addEventListener('click', resetSimulation);
 
-function resetSimulation() {
-
-
+function clearObstacles() {
     for (let i = 0; i < NX; i++) {
         for (let j = 0; j < NY; j++) {
-            grid[IX(i, j)].fi = setEquilibrium(ux0, uy0, rho);
             grid[IX(i, j)].isObstacle = false;
         }
     }
-    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle);
-
-    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
-
-    gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
 }
+
+
+function resetSimulation() {
+    initialize();
+    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
+    gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+    timeStep = 0;
+}
+
+
+xPos.addEventListener("change", () => gctx.clearRect(0, 0, profilePlot.width, profilePlot.height))
+trackHistory.addEventListener('change', () => {
+    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
+    gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+});
+
+
+const playbackSpeed = document.getElementById("playbackSpeed");
+let playbackCounter = 2;
+playbackSpeed.addEventListener("click", () => {
+    switch (playbackCounter) {
+        case 0:
+            deltaT = 3;
+            playbackCounter++;
+            playbackSpeed.textContent = "x0.5";
+            break;
+        case 1:
+            deltaT = 6;
+            playbackCounter++;
+            playbackSpeed.textContent = "x1";
+            break;
+        default:
+            deltaT = 12;
+            playbackCounter -= 2;
+            playbackSpeed.textContent = "x2";
+            break;
+    }
+
+}) 

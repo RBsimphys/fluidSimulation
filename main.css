@@ -30,8 +30,8 @@ body {
 }
 
 /* fluid simulation canvas ------------------------*/
-#titleCaption {
-    font-size: 2em;
+#titleCaption{
+    font-size: 1.6em;
     text-decoration: underline;
 }
 
@@ -63,7 +63,7 @@ input[type="range"] {
 #colorMapLegend {
     position: absolute;
     left: 100%;
-    top: 15.5%;
+    top: 2.5%;
 }
 
 #fluidButtons {
@@ -146,16 +146,19 @@ input[type="radio"] {
 }
 
 .macroLabel {
-    padding: 2px;
-    width: 50px;
+    width: 30px;
+    height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
+
+    border: 1px solid black;
+    border-radius: 50%;
 }
 
 .macroLabel:hover {
     cursor: pointer;
-    background-color: #b9b9ac;
+    background-color: #e9e9ae;
 }
 
 input[type="radio"]:checked+.macroLabel {
@@ -166,11 +169,17 @@ input[type="radio"]:checked+.macroLabel {
 #selectionFormContainer{
     display: flex;  
     flex-direction: row;
+    gap: 10%;
+}
+.selectionForm{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 #plotSelectionForm, #shapeSelectionForm {
     display: inline-flex;
     width: fit-content;
-    border: 1px solid black;
+    gap: 10px;
 }
 
 #reLabel {
@@ -185,4 +194,9 @@ input[type="radio"]:checked+.macroLabel {
 
 #trackHistory {
     width: 15px;
+}
+
+#colorMapSelector{
+    height: 30px;
+    font-size: 1em;
 }

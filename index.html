@@ -12,7 +12,9 @@
 
 <body>
     <figcaption id="titleCaption">Lattice boltzeman fluid simulation</figcaption>
+        
     <div id="simulation">
+
         <div id="plots">
             <div id="fluidPlotContainer">
                 <figure id="fluidPlot">
@@ -180,9 +182,28 @@
                         </svg>
                     </button>
                 </div>
-                <input type="range" min="0" max="97" step="1" value="0" id="xPos">
+                <input type="range" min="0" max="120" step="1" value="0" id="xPos">
 
             </div>
+
+            <!-- <form id="colors">
+                <label for="ha">gamma</label>
+                <input type="range" min="0" max="3" step="0.01" value="0" id="gamma">
+
+                <label for="ha">start</label>
+                <input type="range" min="0" max="10" step="0.01" value="0" id="start">
+
+                <label for="ha">rotations</label>
+                <input type="range" min="0" max="10" step="0.01" value="0" id="rotations">
+
+                <label for="ha">hue</label>
+                <input type="range" min="0" max="10" step="0.01" value="0" id="hue">
+
+                <label for="ha">length</label>
+                <input type="range" min="0" max="100" step="1" value="0" id="length">
+
+            </form> -->
+
 
 
             <div id="chartContainer">
@@ -204,7 +225,7 @@
 
         <fieldset id="plotForm">
             <div id="selectionFormContainer">
-                <div>
+                <div class="selectionForm">
                     <legend id="plotSelectionLegend">Plot:</legend>
                     <form id="plotSelectionForm">
                         <input type="radio" id="plotVorticity" name="plotOption" value="Vorticity" checked>
@@ -217,18 +238,79 @@
                         <label class="macroLabel" for="plotUy">V<sub>y</sub></label>
                     </form>
                 </div>
-                <div>
+                <div class="selectionForm">
                     <legend id="shapeSelectionLegend">Shape:</legend>
                     <form id="shapeSelectionForm">
                         <input type="radio" id="circle" name="plotOption" value="circle" checked>
-                        <label class="macroLabel" for="circle">circle</label>
+                        <label class="macroLabel" for="circle">
+                            <svg width="18.791624" height="17.203541" viewBox="0 0 4.9719504 4.5517703" version="1.1"
+                                id="svg5" sodipodi:docname="circle.svg"
+                                inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    units="px" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0"
+                                    fit-margin-bottom="0" inkscape:zoom="5.6819697" inkscape:cx="-2.9039226"
+                                    inkscape:cy="-11.703688" inkscape:window-width="1920" inkscape:window-height="1016"
+                                    inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1" />
+                                <defs id="defs2" />
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-75.342173,-91.985231)">
+                                    <ellipse
+                                        style="fill:#f2f2f2;stroke-width:0.913;stroke-linejoin:round;stroke-miterlimit:0;paint-order:stroke fill markers;stroke:#000000;stroke-opacity:1;stroke-dasharray:none"
+                                        id="path1141" cx="77.828148" cy="94.261116" rx="1.6041425" ry="1.5886813" />
+                                </g>
+                            </svg>
+
+                        </label>
                         <input type="radio" id="line" name="plotOption" value="line">
-                        <label class="macroLabel" for="line">line</label>
-                        <input type="radio" id="snake" name="plotOption" value="snake">
-                        <label class="macroLabel" for="snake">snake</label>
-                        <input type="radio" id="Air foil" name="plotOption" value="Air foil">
-                        <label class="macroLabel" for="Air foil">Air foil</label>
+                        <label class="macroLabel" for="line">
+
+                            <svg width="18.791624" height="17.203541" viewBox="0 0 4.9719504 4.5517703" version="1.1"
+                                id="svg5" sodipodi:docname="circle.svg"
+                                inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    units="px" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0"
+                                    fit-margin-bottom="0" inkscape:zoom="28.539378" inkscape:cx="9.3730142"
+                                    inkscape:cy="6.1143588" inkscape:window-width="1920" inkscape:window-height="1016"
+                                    inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1" />
+                                <defs id="defs2" />
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-75.342173,-91.985231)">
+                                    <rect
+                                        style="fill:#f2f2f2;stroke:#000000;stroke-width:1.092;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+                                        id="rect5454" width="1.5881234" height="2.8004737" x="77.034088"
+                                        y="92.860878" />
+                                </g>
+                            </svg>
+
+                        </label>
                     </form>
+                </div>
+                <div class="selectionForm">
+                    <label for="colorMapSelector">Color Map:</label>
+                    <select id="colorMapSelector">
+                        <option value="linear">Linear</option>
+                        <option value="blackAndWhite">Black and white</option>
+                        <option value="cubeHelix">Cubehelix</option>
+                        <option value="dracula">Dracula</option>
+                        <option value="virdis">Virdis</option>
+                        <option value="magma">Magma</option>
+                        <option value="inferno">Inferno</option>
+                        <option value="plasma">Plasma</option>
+                        <option value="psychedelic">Psychedelic</option>
+                    </select>
+
                 </div>
             </div>
 

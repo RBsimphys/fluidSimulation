@@ -1305,7 +1305,7 @@ let colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.roun
 let colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
 
 function setColorMap(selection) {
-    switch (selection) {
+    switch (selection) {    
         case "linear":
             colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` };
             colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };

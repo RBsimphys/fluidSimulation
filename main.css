@@ -8,13 +8,13 @@
 
 :root {
     --form-control-color: rgb(75, 75, 75);
-    ;
+
 }
 
 body {
     font-family: 'Times New Roman', serif;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 }
@@ -26,13 +26,15 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     width: 70%;
 }
 
 /* fluid simulation canvas ------------------------*/
-#titleCaption{
+#titleCaption {
     font-size: 1.6em;
     text-decoration: underline;
+    text-align: center;
 }
 
 #xPos {
@@ -63,25 +65,30 @@ input[type="range"] {
 #colorMapLegend {
     position: absolute;
     left: 100%;
-    top: 2.5%;
+    top: 2.25%;
 }
 
 #fluidButtons {
-    display: flex;
-    align-items: center;
-    justify-content: baseline;
+    /* display: flex; */
 }
 
-#fluidButtons>* {
+#videoControlButtons{ 
     display: flex;
-    align-items: center;
+}
+
+#videoControlButtons>* {
     border: none;
     background-color: white;
     padding: 10px;
 }
 
-#fluidButtons>*:hover {
+#videoControlButtons>*:hover {
     background-color: #d9d9c7;
+}
+
+#resolutionSelector{
+    display: inline;
+
 }
 
 #playIcon {
@@ -166,17 +173,20 @@ input[type="radio"]:checked+.macroLabel {
     color: white;
 }
 
-#selectionFormContainer{
-    display: flex;  
+#selectionFormContainer {
+    display: flex;
     flex-direction: row;
     gap: 10%;
 }
-.selectionForm{
+
+.selectionForm {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
-#plotSelectionForm, #shapeSelectionForm {
+
+#plotSelectionForm,
+#shapeSelectionForm {
     display: inline-flex;
     width: fit-content;
     gap: 10px;
@@ -196,7 +206,7 @@ input[type="radio"]:checked+.macroLabel {
     width: 15px;
 }
 
-#colorMapSelector{
+#colorMapSelector {
     height: 30px;
     font-size: 1em;
 }

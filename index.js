@@ -1,3 +1,5 @@
+
+// import {stream, collide, initialize, setEquilibrium} from "/LBM.js"
 // ===================================================================================
 // SIMULATION CANVAS 
 const simulationCanvas = document.getElementById("simulationCanvas");
@@ -11,7 +13,6 @@ let animating = true;
 
 // ======================================================================================
 // GRID SETUP STUFF  
-
 // velocity directions,
 const e = [
     [0, 0],                                   // 0
@@ -43,34 +44,30 @@ let rho = 1;                                  //initial density
 let mu = ux0 * obsRadius / Re.value;	                          //viscosity
 let omega = 1 / (3 * mu + 0.5);             //relaxation parameter
 
-
 const Cell = (rho, ux, uy, isObstacle) => {
     let fi = new Array(9);
     let feq = new Array(9);
-    let vorticity;
-    let state = {
+    return {
         rho,
         ux,
         uy,
         fi,
         feq,
         isObstacle,
-        vorticity,
     }
-    return Object.assign(
-        {},
-        state,
-    )
 }
-
 
 let grid = new Array(NX * NY);
 
-for (let i = 0; i < NX; i++) {
-    for (let j = 0; j < NY; j++) {
-        grid[IX(i, j)] = Cell(1, 0, 0, false);
+function createGrid() {
+    for (let i = 0; i < NX; i++) {
+        for (let j = 0; j < NY; j++) {
+            grid[IX(i, j)] = Cell(1, 0, 0, false);
+        }
     }
 }
+
+createGrid()
 
 
 function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape) {
@@ -112,9 +109,6 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape) {
 
 
 }
-
-setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
-
 
 // ======================================================================================
 // PHYSICS STUFF
@@ -158,7 +152,7 @@ function collide() {
     }
 }
 //  in-place stream function, with bounce back boundary condition  
-let fbounce = [0, 5, 6, 7, 8, 1, 2, 3, 4];
+const fbounce = [0, 5, 6, 7, 8, 1, 2, 3, 4];
 function stream() {
     // N NE E SE S        
     for (let x = NX - 2; x > 0; x--) {
@@ -187,70 +181,45 @@ function stream() {
             }
         }
     }
+
 }
 // ==================================================================================================
 //set obstacles 
-
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
 let shapeSelection = "circle";
-
-
+setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
 // ======================================================================================
 // DRAW STUFF  
-
-
-// plot options 
+// COLOR MAPS  
 const plotOptionButtons = document.querySelectorAll('input[name="plotOption"]');
-let plotSelection = "Vorticity";
-
 const formInputs = document.querySelectorAll('#colors input');
-const chbtn = document.getElementById("chbtn");
-
-
-const inputValues = {};
-function getInputValues() {
-    formInputs.forEach(input => {
-        inputValues[input.id] = input.value;
-    });
-    cubeHelixMapVorticity = cubehelix(inputValues.gamma, inputValues.start, inputValues.rotations, inputValues.hue, inputValues.length);
-    console.log(inputValues);
-    setColorLegend()
-}
-
-formInputs.forEach(input => {
-    input.addEventListener('input', event => {
-        getInputValues();
-        // Do something with the updated input values...
-    });
-});
-
-// ======================================================================================
-// COLOR STUFF
+let plotSelection = "vorticity";
 
 // linear color map generator 
 function lerp(low, high, t) { return high + (low - high) * t };
-
 // CUBE HELIX COLOR MAP - based on this paper (https://astron-soc.in/bulletin/11June/289392011.pdf)
 // BY D. A. Green Cavendish Laboratory, 19 J. J. Thomson Avenue, Cambridge CB3 0HE, U.K.
-function cubehelix(gamma, start, rotations, hue, length) {
+function cubehelixGenerator(gamma, start, rotations, hue, length) {
     let cmap = [];
     for (let i = 1; i < length; i++) {
         let fract = (i - 1) / (length - 1);
         let angle = 2 * Math.PI * (start / 3 + 1 + rotations * fract);
         fract = fract ** gamma;
-        AMP = hue * fract * (1 - fract) / 2;
-        R = fract + AMP * (-0.14861 * Math.cos(angle) + 1.78277 * Math.sin(angle));
-        G = fract + AMP * (-0.29227 * Math.cos(angle) - 0.90649 * Math.sin(angle));
-        B = fract + AMP * (+1.97294 * Math.cos(angle));
+        let AMP = hue * fract * (1 - fract) / 2;
+        let R = fract + AMP * (-0.14861 * Math.cos(angle) + 1.78277 * Math.sin(angle));
+        let G = fract + AMP * (-0.29227 * Math.cos(angle) - 0.90649 * Math.sin(angle));
+        let B = fract + AMP * (+1.97294 * Math.cos(angle));
         cmap.push(`rgb(${R * 256},${G * 256},${B * 256})`);
     }
     return cmap;
 }
-let cubeHelixMapUy = cubehelix(0.9, 1.5, 1, 1, 1000);
-let cubeHelixMapUx = cubehelix(0.9, 0, 1, 1, 1000);
-let cubeHelixMapVorticity = cubehelix(0.8, 1, 2, 1, 1000);
-let cubeHelixMapRho = cubehelix(1, 10, 3, 1, 1000);
-let psychedelicMap = cubehelix(0.48, 100, 10, 1.5, 1000);
+const cubehelix = {
+    Uy: cubehelixGenerator(0.9, 1.5, 1, 1, 1000),
+    Ux: cubehelixGenerator(0.9, 0, 1, 1, 1000),
+    v: cubehelixGenerator(0.8, 1, 2, 1, 1000),
+    rho: cubehelixGenerator(1, 10, 3, 1, 1000),
+    psychedelic: cubehelixGenerator(0.48, 100, 10, 1.5, 1000),
+}
 
 // other color maps adopted from Matplotlib team, Stefan van der Walt, Nathaniel J. Smith, Jey Kottalam and Nathan Goldbaum, 
 // https://github.com/BIDS/colormap/blob/master/colormaps.py 
@@ -1288,101 +1257,158 @@ let plasma = [
     "rgb(240.64384,249.640448,33.619456)"
 ];
 
-stringA = [];
-for (i = 0; i < plasma.length; i++) {
-    let r = plasma[i][0] * 256;
-    let g = plasma[i][1] * 256;
-    let b = plasma[i][2] * 256;
-
-    let s = `rgb(${r},${g},${b})`;
-    stringA.push(s);
-}
-
 // deafualt color map
-let colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` };
+let colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 150, a))})` };
 let colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };
 let colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` };
 let colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
 
+
+const colorMaps = {
+    linear: (a) => {
+        colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` };
+        colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };
+        colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` };
+        colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
+
+
+    },
+    blackAndWhite: (a) => {
+        colorUx = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+        colorUy = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+        colorVorticity = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+        colorRho = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+
+
+    },
+    cubeHelix: (a) => {
+        colorUx = (a) => { return cubehelix.Ux[Math.round(a * cubehelix.Ux.length - 1)] };
+        colorUy = (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] };
+        colorVorticity = (a) => { return cubehelix.v[Math.round(a * cubehelix.Ux.length - 1)] };
+        colorRho = (a) => { return cubehelix.rho[Math.round(a * cubehelix.Ux.length - 1)] };
+
+    },
+    dracula: (a) => {
+
+        colorUx = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
+        colorUy = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
+        colorVorticity = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
+        colorRho = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
+    },
+    virdis: (a) => {
+
+        colorUx = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
+        colorUy = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
+        colorVorticity = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
+        colorRho = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
+    },
+    magma: (a) => {
+
+        colorUx = (a) => { return magma[Math.round(a * magma.length - 1)] };
+        colorUy = (a) => { return magma[Math.round(a * magma.length - 1)] };
+        colorVorticity = (a) => { return magma[Math.round(a * magma.length - 1)] };
+        colorRho = (a) => { return magma[Math.round(a * magma.length - 1)] };
+    },
+    inferno: (a) => {
+
+        colorUx = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
+        colorUy = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
+        colorVorticity = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
+        colorRho = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
+
+    },
+    plasma: (a) => {
+
+        colorUx = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
+        colorUy = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
+        colorVorticity = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
+        colorRho = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
+
+    },
+    psychedelic: (a) => {
+        return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)];
+    },
+
+}
+function getColor(selection) {
+    return colorMaps[selection] || colorMaps.linear();
+}
 function setColorMap(selection) {
-    switch (selection) {    
-        case "linear":
-            colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` };
-            colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };
-            colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` };
-            colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
-
-            break;
-        case "blackAndWhite":
-            colorUx = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-            colorUy = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-            colorVorticity = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-            colorRho = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-            break;
-        case "cubeHelix":
-            // cube helix color maps
-            colorUx = (a) => { return cubeHelixMapUx[Math.round(a * cubeHelixMapUx.length - 1)] };
-            colorUy = (a) => { return cubeHelixMapUy[Math.round(a * cubeHelixMapUy.length - 1)] };
-            colorVorticity = (a) => { return cubeHelixMapVorticity[Math.round(a * cubeHelixMapVorticity.length - 1)] };
-            colorRho = (a) => { return cubeHelixMapRho[Math.round(a * cubeHelixMapRho.length - 1)] };
-
-            break;
-        case "dracula":
-            colorUx = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-            colorUy = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-            colorVorticity = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-            colorRho = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-            break;
-        case "virdis":
-            colorUx = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-            colorUy = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-            colorVorticity = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-            colorRho = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-            break;
-        case "magma":
-            colorUx = (a) => { return magma[Math.round(a * magma.length - 1)] };
-            colorUy = (a) => { return magma[Math.round(a * magma.length - 1)] };
-            colorVorticity = (a) => { return magma[Math.round(a * magma.length - 1)] };
-            colorRho = (a) => { return magma[Math.round(a * magma.length - 1)] };
-            break;
-        case "inferno":
-            colorUx = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-            colorUy = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-            colorVorticity = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-            colorRho = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-            break;
-            break;
-
-        case "plasma":
-            colorUx = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-            colorUy = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-            colorVorticity = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-            colorRho = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-            break;
-            break;
-
-        case "psychedelic":
-
-            psychedelicLerp = (a) => { return psychedelicMap[Math.round(a * psychedelicMap.length - 1)] };
-
-            break;
-        default:
-            // linear
-            break;
-    }
-
+    getColor(selection)();
     setColorLegend();
 }
 
 
-// psychedelic mode button 
-const psychedelicMode = document.getElementById("psychedelicMode");
+// const colorMaps = {
+//     linear: {
+//         colorVorticity : (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` },
+//         colorRho : (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` },
+//         colorUx : (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` },
+//         colorUy : (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` },
 
 
-let psychedelicLerp = (a) => { return psychedelicMap[Math.round(a * psychedelicMap.length - 1)] };
+//     },
+//     blackAndWhite: {
+//         colorUx : (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+//         colorUy : (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+//         colorVorticity :(a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+//         colorRho :(a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
+
+
+//     },
+//     cubeHelix: (a) => {
+//         colorUx : (a) => { return cubehelix.Ux[Math.round(a * cubehelix.Ux.length - 1)] };
+//         colorUy : (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] };
+//         colorVorticity : (a) => { return cubehelix.v[Math.round(a * cubehelix.Ux.length - 1)] };
+//         colorRho : (a) => { return cubehelix.rho[Math.round(a * cubehelix.Ux.length - 1)] };
+
+//     },
+//     dracula: (a) => {
+
+//         colorUx : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
+//         colorUy : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
+//         colorVorticity : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
+//         colorRho : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
+//     },
+//     virdis: (a) => {
+
+//         colorUx : (a) => { return virdis[Math.round(a * virdis.length - 1)] },
+//         colorUy : (a) => { return virdis[Math.round(a * virdis.length - 1)] },
+//         colorVorticity :(a) => { return virdis[Math.round(a * virdis.length - 1)] },
+//         colorRho :(a) => { return virdis[Math.round(a * virdis.length - 1)] },
+//     },
+//     magma: (a) => {
+
+//         colorUx : (a) => { return magma[Math.round(a * magma.length - 1)] },
+//         colorUy : (a) => { return magma[Math.round(a * magma.length - 1)] },
+//         colorVorticity :(a) => { return magma[Math.round(a * magma.length - 1)] },
+//         colorRho :(a) => { return magma[Math.round(a * magma.length - 1)] },
+//     },
+//     inferno: (a) => {
+
+//         colorUx : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
+//         colorUy : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
+//         colorVorticity : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
+//         colorRho : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
+
+//     },
+//     plasma: (a) => {
+
+//         colorUx : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
+//         colorUy : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
+//         colorVorticity : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
+//         colorRho :(a) => { return plasma[Math.round(a * plasma.length - 1)] },
+
+//     },
+//     psychedelic: (a) => {
+//         return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)];
+//     },
+
+// }
 
 // ======================================================================================   
 // draw fluid simulation 
+
 function draw(posx) {
     let ext = getExtremum();
     let c;
@@ -1392,25 +1418,22 @@ function draw(posx) {
             let index = i + j * NX;
             let normalizedValue = 0;
             switch (plotSelection) {
-                case "Density":
+                case "rho":
                     normalizedValue = (grid[index].rho - ext.rho.min) / (ext.rho.max - ext.rho.min);
                     c = colorRho(normalizedValue);
                     break;
-                case "Ux":
-                    normalizedValue = (grid[index].ux - ext.Ux.min) / (ext.Ux.max - ext.Ux.min);
+                case "ux":
+                    normalizedValue = (grid[index].ux - ext.ux.min) / (ext.ux.max - ext.ux.min);
                     c = colorUx(normalizedValue);
                     break;
-                case "Uy":
-                    normalizedValue = (grid[index].uy - ext.Uy.min) / (ext.Uy.max - ext.Uy.min);
+                case "uy":
+                    normalizedValue = (grid[index].uy - ext.uy.min) / (ext.uy.max - ext.uy.min);
                     c = colorUy(normalizedValue);
                     break;
                 default:
                     normalizedValue = (curl(i, j) - ext.vorticity.min) / (ext.vorticity.max - ext.vorticity.min);
                     c = colorVorticity(normalizedValue);
                     break;
-            }
-            if (psychedelicMode.checked) {
-                c = psychedelicLerp(normalizedValue);
             }
             ctx.fillStyle = c;
             // color obstacles 
@@ -1431,7 +1454,6 @@ function draw(posx) {
     ctx.fillStyle = "rgba(0,0,100,90%)";
     ctx.fillText(`μ = ${Math.round(mu * 100) / 100}; [Ux,Uy] = [${ux0},${uy0}]; Δt:${deltaT}; step:${timeStep};`, 10, simulationCanvas.height - 10);
 }
-
 // color legend for fluid simulation 
 
 const colorLegend = document.getElementById("colorMapLegend");
@@ -1439,26 +1461,25 @@ const clctx = colorLegend.getContext("2d");
 colorLegend.width = 50;
 colorLegend.height = 120;
 let legendWidth = 20;
-
 function setColorLegend() {
     clctx.fillStyle = "black";
     clctx.font = "10px Arial";
     clctx.fillText("0", 23, 10);
     clctx.fillText("1", 23, colorLegend.height - 5);
     switch (plotSelection) {
-        case "Density":
+        case "rho":
             for (let n = 0; n < 1; n += 0.08) {
                 clctx.fillStyle = colorRho(n);
                 clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
             }
             break;
-        case "Ux":
+        case "ux":
             for (let n = 0; n < 1; n += 0.08) {
                 clctx.fillStyle = colorUx(n);
                 clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
             }
             break;
-        case "Uy":
+        case "uy":
             for (let n = 0; n < 1; n += 0.08) {
                 clctx.fillStyle = colorUy(n);
                 clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
@@ -1470,12 +1491,6 @@ function setColorLegend() {
                 clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
             }
             break;
-    }
-    if (psychedelicMode.checked) {
-        for (let n = 0; n < 1; n += 0.08) {
-            clctx.fillStyle = psychedelicLerp(n);
-            clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
-        }
     }
     // // draw graph borders 
     // clctx.beginPath();
@@ -1516,7 +1531,7 @@ function plotProfile(posx) {
     let ext = getExtremum(); //get absolute mins and maxes to normalize values 
     let data = [0];
     switch (plotSelection) {
-        case "Density":
+        case "rho":
             for (let i = 1; i < NY - 1; i++) {
                 data.push((grid[IX(posx, i)].rho - ext.rho.min) / (ext.rho.max - ext.rho.min));
             }
@@ -1524,18 +1539,18 @@ function plotProfile(posx) {
             graphXaxis.innerHTML = "Normalized Density (ρ<sub>i</sub> / ρ<sub>max</sub>)";
             plotSelectionLegend.textContent = "Plot: Density"
             break;
-        case "Ux":
+        case "ux":
             for (let i = 1; i < NY - 1; i++) {
-                data.push((grid[IX(posx, i)].ux - ext.Ux.min) / (ext.Ux.max - ext.Ux.min));
+                data.push((grid[IX(posx, i)].ux - ext.ux.min) / (ext.ux.max - ext.ux.min));
 
             }
             graphCaption.textContent = `X velocity profile @ x = ${posx}`;
             graphXaxis.innerHTML = "Normalized X-Velocity (U<sub>i</sub> / U<sub>max</sub>)";
             plotSelectionLegend.textContent = "Plot: X-Velocity"
             break;
-        case "Uy":
+        case "uy":
             for (let i = 1; i < NY - 1; i++) {
-                data.push(((grid[IX(posx, i)].uy - ext.Uy.min) / (ext.Uy.max - ext.Uy.min)));
+                data.push(((grid[IX(posx, i)].uy - ext.uy.min) / (ext.uy.max - ext.uy.min)));
             }
 
             graphCaption.textContent = `Y-velocity profile @ x = ${posx}`;
@@ -1606,7 +1621,7 @@ const xHistogramLabel = document.getElementById("xHistogramLabel");
 function plotHistogram() {
     let data = [];
     switch (plotSelection) {
-        case "Density":
+        case "rho":
             for (let i = 0; i < NX; i++) {
                 for (let j = 0; j < NY; j++) {
                     data.push((grid[IX(i, j)].rho));
@@ -1616,7 +1631,7 @@ function plotHistogram() {
             xHistogramLabel.textContent = "Density";
             break;
 
-        case "Ux":
+        case "ux":
             for (let i = 0; i < NX; i++) {
                 for (let j = 0; j < NY; j++) {
                     data.push((grid[IX(i, j)].ux));
@@ -1625,7 +1640,7 @@ function plotHistogram() {
             histogramCaption.textContent = `X velocity histogram`;
             xHistogramLabel.textContent = "X-Velocity";
             break;
-        case "Uy":
+        case "uy":
             for (let i = 0; i < NX; i++) {
                 for (let j = 0; j < NY; j++) {
                     data.push((grid[IX(i, j)].uy));
@@ -1703,17 +1718,18 @@ initialize();
 
 function simulate() {
     ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
+
     let c = 160;
     switch (plotSelection) {
-        case "Density":
+        case "rho":
             gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 121, 75, 20%)`;
             hctx.fillStyle = `rgba(160, 121, 75, 1%)`;
             break;
-        case "Ux":
+        case "ux":
             gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
             hctx.fillStyle = `rgba(241, 109, 75, 1%)`;
             break;
-        case "Uy":
+        case "uy":
             gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
             hctx.fillStyle = `rgba(143, 124, 100, 1%)`;
             break;
@@ -1772,7 +1788,6 @@ function curl(i, j) {
 
 function getExtremum() {
     let vorticity = [];
-
     for (let i = 1; i < NX - 1; i++) {
         for (let j = 1; j < NY - 1; j++) {
             vorticity.push(curl(i, j));
@@ -1799,12 +1814,11 @@ function getExtremum() {
 
     return {
         rho: { max: maxRho, min: minRho },
-        Uy: { max: maxUy, min: minUy },
-        Ux: { max: maxUx, min: minUx },
+        uy: { max: maxUy, min: minUy },
+        ux: { max: maxUx, min: minUx },
         vorticity: { max: maxVort, min: minVort },
     }
 }
-
 // =====================================================================================
 // EVENT LISTENRES 
 
@@ -1923,3 +1937,24 @@ const colorMapSelector = document.getElementById("colorMapSelector");
 colorMapSelector.addEventListener("change", function () {
     setColorMap(this.value);
 });
+
+
+
+
+const resolutionSelector = document.getElementById('resolutionSelector');
+
+function updateResolution() {
+
+    N = resolutionSelector.value;
+    NX = simulationCanvas.width / N;
+    NY = simulationCanvas.height / N;
+
+    obsRadius = NY * 0.1;
+    obsXpos = NX * 0.1;
+    obsYpos = NY * 0.5;
+    createGrid();
+    initialize();
+    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+}
+
+resolutionSelector.addEventListener("change", updateResolution)

@@ -47,10 +47,12 @@ let omega = 1 / (3 * mu + 0.5);             //relaxation parameter
 const Cell = (rho, ux, uy, isObstacle) => {
     let fi = new Array(9);
     let feq = new Array(9);
+    let vorticity = 0;
     return {
         rho,
         ux,
         uy,
+        vorticity,
         fi,
         feq,
         isObstacle,
@@ -187,13 +189,18 @@ function stream() {
 //set obstacles 
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
 let shapeSelection = "circle";
+
 setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
 // ======================================================================================
 // DRAW STUFF  
 // COLOR MAPS  
-const plotOptionButtons = document.querySelectorAll('input[name="plotOption"]');
+const plotOptionButtons = document.querySelectorAll('#plotSelectionForm>*');
 const formInputs = document.querySelectorAll('#colors input');
 let plotSelection = "vorticity";
+
+
+
+
 
 // linear color map generator 
 function lerp(low, high, t) { return high + (low - high) * t };
@@ -1257,192 +1264,38 @@ let plasma = [
     "rgb(240.64384,249.640448,33.619456)"
 ];
 
-// deafualt color map
-let colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 150, a))})` };
-let colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };
-let colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` };
-let colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
-
-
 const colorMaps = {
-    linear: (a) => {
-        colorVorticity = (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` };
-        colorRho = (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` };
-        colorUx = (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` };
-        colorUy = (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` };
-
-
-    },
-    blackAndWhite: (a) => {
-        colorUx = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-        colorUy = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-        colorVorticity = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-        colorRho = (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-
-
-    },
-    cubeHelix: (a) => {
-        colorUx = (a) => { return cubehelix.Ux[Math.round(a * cubehelix.Ux.length - 1)] };
-        colorUy = (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] };
-        colorVorticity = (a) => { return cubehelix.v[Math.round(a * cubehelix.Ux.length - 1)] };
-        colorRho = (a) => { return cubehelix.rho[Math.round(a * cubehelix.Ux.length - 1)] };
-
-    },
-    dracula: (a) => {
-
-        colorUx = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-        colorUy = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-        colorVorticity = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-        colorRho = (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` };
-    },
-    virdis: (a) => {
-
-        colorUx = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-        colorUy = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-        colorVorticity = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-        colorRho = (a) => { return virdis[Math.round(a * virdis.length - 1)] };
-    },
-    magma: (a) => {
-
-        colorUx = (a) => { return magma[Math.round(a * magma.length - 1)] };
-        colorUy = (a) => { return magma[Math.round(a * magma.length - 1)] };
-        colorVorticity = (a) => { return magma[Math.round(a * magma.length - 1)] };
-        colorRho = (a) => { return magma[Math.round(a * magma.length - 1)] };
-    },
-    inferno: (a) => {
-
-        colorUx = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-        colorUy = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-        colorVorticity = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-        colorRho = (a) => { return inferno[Math.round(a * inferno.length - 1)] };
-
-    },
-    plasma: (a) => {
-
-        colorUx = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-        colorUy = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-        colorVorticity = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-        colorRho = (a) => { return plasma[Math.round(a * plasma.length - 1)] };
-
-    },
-    psychedelic: (a) => {
-        return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)];
-    },
+    linear: (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` },
+    blackAndWhite: (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` },
+    cubeHelix: (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] },
+    dracula: (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
+    virdis: (a) => { return virdis[Math.round(a * virdis.length - 1)] },
+    magma: (a) => { return magma[Math.round(a * magma.length - 1)] },
+    inferno: (a) => { return inferno[Math.round(a * inferno.length - 1)] },
+    plasma: (a) => { return plasma[Math.round(a * plasma.length - 1)] },
+    psychedelic: (a) => { return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)] },
 
 }
-function getColor(selection) {
-    return colorMaps[selection] || colorMaps.linear();
-}
-function setColorMap(selection) {
-    getColor(selection)();
-    setColorLegend();
-}
 
-
-// const colorMaps = {
-//     linear: {
-//         colorVorticity : (a) => { return `rgb(${Math.round(lerp(255, 30, a))}, ${Math.round(lerp(200, 74, a))},${Math.round(lerp(52, 125, a))})` },
-//         colorRho : (a) => { return `rgb(${Math.round(lerp(44, 256, a))}, ${Math.round(lerp(0, 231, a))},${Math.round(lerp(100, 228, a))})` },
-//         colorUx : (a) => { return `rgb(${Math.round(lerp(255, 190, a))}, ${Math.round(lerp(255, 88, a))},${Math.round(lerp(255, 105, a))}` },
-//         colorUy : (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` },
-
-
-//     },
-//     blackAndWhite: {
-//         colorUx : (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-//         colorUy : (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-//         colorVorticity :(a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-//         colorRho :(a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` };
-
-
-//     },
-//     cubeHelix: (a) => {
-//         colorUx : (a) => { return cubehelix.Ux[Math.round(a * cubehelix.Ux.length - 1)] };
-//         colorUy : (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] };
-//         colorVorticity : (a) => { return cubehelix.v[Math.round(a * cubehelix.Ux.length - 1)] };
-//         colorRho : (a) => { return cubehelix.rho[Math.round(a * cubehelix.Ux.length - 1)] };
-
-//     },
-//     dracula: (a) => {
-
-//         colorUx : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
-//         colorUy : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
-//         colorVorticity : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
-//         colorRho : (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
-//     },
-//     virdis: (a) => {
-
-//         colorUx : (a) => { return virdis[Math.round(a * virdis.length - 1)] },
-//         colorUy : (a) => { return virdis[Math.round(a * virdis.length - 1)] },
-//         colorVorticity :(a) => { return virdis[Math.round(a * virdis.length - 1)] },
-//         colorRho :(a) => { return virdis[Math.round(a * virdis.length - 1)] },
-//     },
-//     magma: (a) => {
-
-//         colorUx : (a) => { return magma[Math.round(a * magma.length - 1)] },
-//         colorUy : (a) => { return magma[Math.round(a * magma.length - 1)] },
-//         colorVorticity :(a) => { return magma[Math.round(a * magma.length - 1)] },
-//         colorRho :(a) => { return magma[Math.round(a * magma.length - 1)] },
-//     },
-//     inferno: (a) => {
-
-//         colorUx : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
-//         colorUy : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
-//         colorVorticity : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
-//         colorRho : (a) => { return inferno[Math.round(a * inferno.length - 1)] },
-
-//     },
-//     plasma: (a) => {
-
-//         colorUx : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
-//         colorUy : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
-//         colorVorticity : (a) => { return plasma[Math.round(a * plasma.length - 1)] },
-//         colorRho :(a) => { return plasma[Math.round(a * plasma.length - 1)] },
-
-//     },
-//     psychedelic: (a) => {
-//         return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)];
-//     },
-
-// }
-
-// ======================================================================================   
-// draw fluid simulation 
+let colorMapSelected = "virdis";
 
 function draw(posx) {
-    let ext = getExtremum();
-    let c;
+    setCurl();
+    let ext = getExtremum(plotSelection);
+    let normalizedValue = 0;
     // color grid 
     for (let i = 1; i < NX - 1; i++) {
         for (let j = 1; j < NY - 1; j++) {
-            let index = i + j * NX;
-            let normalizedValue = 0;
-            switch (plotSelection) {
-                case "rho":
-                    normalizedValue = (grid[index].rho - ext.rho.min) / (ext.rho.max - ext.rho.min);
-                    c = colorRho(normalizedValue);
-                    break;
-                case "ux":
-                    normalizedValue = (grid[index].ux - ext.ux.min) / (ext.ux.max - ext.ux.min);
-                    c = colorUx(normalizedValue);
-                    break;
-                case "uy":
-                    normalizedValue = (grid[index].uy - ext.uy.min) / (ext.uy.max - ext.uy.min);
-                    c = colorUy(normalizedValue);
-                    break;
-                default:
-                    normalizedValue = (curl(i, j) - ext.vorticity.min) / (ext.vorticity.max - ext.vorticity.min);
-                    c = colorVorticity(normalizedValue);
-                    break;
-            }
-            ctx.fillStyle = c;
+            let index = IX(i, j);
+            normalizedValue = (grid[index][plotSelection] - ext.min) / (ext.max - ext.min);
+            ctx.fillStyle = colorMaps[colorMapSelected](normalizedValue);
             // color obstacles 
             if (grid[index].isObstacle) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 100%)';
             }
             ctx.fillRect(i * N, j * N, N, N);
             // color graph position slider 
-            if (i == posx) {
+            if (i === posx) {
                 ctx.fillStyle = 'rgba(255, 205, 0, 50%)';
                 ctx.fillRect(i * N, j * N, N, N);
             }
@@ -1453,11 +1306,13 @@ function draw(posx) {
     ctx.font = "10px Times New Roman";
     ctx.fillStyle = "rgba(0,0,100,90%)";
     ctx.fillText(`μ = ${Math.round(mu * 100) / 100}; [Ux,Uy] = [${ux0},${uy0}]; Δt:${deltaT}; step:${timeStep};`, 10, simulationCanvas.height - 10);
-}
-// color legend for fluid simulation 
 
+}
+
+// color legend 
 const colorLegend = document.getElementById("colorMapLegend");
-const clctx = colorLegend.getContext("2d");
+const Ncolor = 15;
+let clctx = colorLegend.getContext("2d");
 colorLegend.width = 50;
 colorLegend.height = 120;
 let legendWidth = 20;
@@ -1466,31 +1321,9 @@ function setColorLegend() {
     clctx.font = "10px Arial";
     clctx.fillText("0", 23, 10);
     clctx.fillText("1", 23, colorLegend.height - 5);
-    switch (plotSelection) {
-        case "rho":
-            for (let n = 0; n < 1; n += 0.08) {
-                clctx.fillStyle = colorRho(n);
-                clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
-            }
-            break;
-        case "ux":
-            for (let n = 0; n < 1; n += 0.08) {
-                clctx.fillStyle = colorUx(n);
-                clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
-            }
-            break;
-        case "uy":
-            for (let n = 0; n < 1; n += 0.08) {
-                clctx.fillStyle = colorUy(n);
-                clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
-            }
-            break;
-        default:
-            for (let n = 0; n < 1; n += 0.08) {
-                clctx.fillStyle = colorVorticity(n);
-                clctx.fillRect(0, colorLegend.height * n, legendWidth, colorLegend.height);
-            }
-            break;
+    for (let n = 0; n < Ncolor; n++) {
+        clctx.fillStyle = colorMaps[colorMapSelected](n / Ncolor);
+        clctx.fillRect(0, colorLegend.height * n / Ncolor, legendWidth, colorLegend.height);
     }
     // // draw graph borders 
     // clctx.beginPath();
@@ -1511,9 +1344,9 @@ setColorLegend();
 const profilePlot = document.getElementById("profilePlot");
 const gctx = profilePlot.getContext("2d");
 
-const graphCaption = document.getElementById("profilePlotCaption");
+const profilePlotCaption = document.getElementById("profilePlotCaption");
 const xPos = document.getElementById("xPos");
-const graphXaxis = document.getElementById("xLabel");
+const profilePlotxLabel = document.getElementById("xLabel");
 const plotSelectionLegend = document.getElementById("plotSelectionLegend");
 
 const trackHistory = document.getElementById("trackHistory");
@@ -1521,54 +1354,22 @@ const trackHistory = document.getElementById("trackHistory");
 let plotWidth = 350;
 let plotHeight = 200;
 let buffer = 30;
-let chartWidth = plotWidth + buffer;
-let chartHeight = plotHeight + buffer;
-profilePlot.width = chartWidth;
-profilePlot.height = chartHeight;
+profilePlot.width = plotWidth + buffer;
+profilePlot.height = plotHeight + buffer;
 
+let profilePlotTitles = {
+    rho: "Normalized Density (ρ<sub>i</sub> / ρ<sub>max</sub>)",
+    ux: "Normalized X-Velocity (U<sub>i</sub> / U<sub>max</sub>)",
+    uy: "Normalized Y-Velocity (U<sub>i</sub> / U<sub>max</sub>)",
+    vorticity: "Normalized Vorticity (ω<sub>i</sub> / ω<sub>max</sub>)",
+}
 
 function plotProfile(posx) {
-    let ext = getExtremum(); //get absolute mins and maxes to normalize values 
+    let ext = getExtremum(plotSelection); //get absolute mins and maxes to normalize values 
     let data = [0];
-    switch (plotSelection) {
-        case "rho":
-            for (let i = 1; i < NY - 1; i++) {
-                data.push((grid[IX(posx, i)].rho - ext.rho.min) / (ext.rho.max - ext.rho.min));
-            }
-            graphCaption.textContent = `Density profile @ x = ${posx}`;
-            graphXaxis.innerHTML = "Normalized Density (ρ<sub>i</sub> / ρ<sub>max</sub>)";
-            plotSelectionLegend.textContent = "Plot: Density"
-            break;
-        case "ux":
-            for (let i = 1; i < NY - 1; i++) {
-                data.push((grid[IX(posx, i)].ux - ext.ux.min) / (ext.ux.max - ext.ux.min));
-
-            }
-            graphCaption.textContent = `X velocity profile @ x = ${posx}`;
-            graphXaxis.innerHTML = "Normalized X-Velocity (U<sub>i</sub> / U<sub>max</sub>)";
-            plotSelectionLegend.textContent = "Plot: X-Velocity"
-            break;
-        case "uy":
-            for (let i = 1; i < NY - 1; i++) {
-                data.push(((grid[IX(posx, i)].uy - ext.uy.min) / (ext.uy.max - ext.uy.min)));
-            }
-
-            graphCaption.textContent = `Y-velocity profile @ x = ${posx}`;
-            graphXaxis.innerHTML = "Normalized Y-Velocity (U<sub>i</sub> / U<sub>max</sub>)";
-            plotSelectionLegend.textContent = "Plot: Y-Velocity"
-
-            break;
-        default:
-            for (let i = 2; i < NY - 2; i++) {
-                let norm_speed = (curl(posx, i) - ext.vorticity.min) / (ext.vorticity.max - ext.vorticity.min);
-                data.push(norm_speed);
-            }
-            graphCaption.textContent = `Vorticity profile @ x = ${posx}`;
-            graphXaxis.innerHTML = "Normalized Vorticity (ω<sub>i</sub> / ω<sub>max</sub>)";
-            plotSelectionLegend.textContent = "Plot: Vorticity"
-            break;
+    for (let i = 1; i < NY - 1; i++) {
+        data.push((grid[IX(posx, i)][plotSelection] - ext.min) / (ext.max - ext.min));
     }
-
     data.push(0);
     // graph data 
     gctx.beginPath();
@@ -1578,7 +1379,7 @@ function plotProfile(posx) {
     }
     gctx.stroke();
 
-    gctx.strokeStyle = "rgba(75,75,75,100%)";
+    gctx.strokeStyle = "black";
     // draw graph borders 
     gctx.beginPath();
     gctx.moveTo(0, 0);
@@ -1593,14 +1394,16 @@ function plotProfile(posx) {
     for (let i = 0; i <= 1; i += 0.1) {
         gctx.beginPath();
         gctx.moveTo(plotWidth * i, plotHeight);
-        gctx.lineTo(plotWidth * i, chartHeight * 0.9);
+        gctx.lineTo(plotWidth * i, profilePlot.height * 0.9);
         gctx.closePath();
         gctx.stroke();
     }
 
     gctx.font = 'normal 20px Times New Roman';
-    gctx.fillText("1", plotWidth - 10, chartHeight);
-    gctx.fillText("0", 0, chartHeight);
+    profilePlotCaption.textContent = `${plotSelection} profile plot at x = ${posx}`;
+    profilePlotxLabel.innerHTML = profilePlotTitles[plotSelection];
+    gctx.fillText("1", plotWidth - 10, profilePlot.height);
+    gctx.fillText("0", 0, profilePlot.height);
 
 }
 
@@ -1618,63 +1421,27 @@ histogramPlot.height = histogramHeight + buffer;
 const histogramCaption = document.getElementById("histogramCaption");
 const xHistogramLabel = document.getElementById("xHistogramLabel");
 
+function resetTitles(plotSelection) {
+    histogramCaption.textContent = plotSelection + " histogram";
+    xHistogramLabel.textContent = plotSelection;
+}
+
 function plotHistogram() {
     let data = [];
-    switch (plotSelection) {
-        case "rho":
-            for (let i = 0; i < NX; i++) {
-                for (let j = 0; j < NY; j++) {
-                    data.push((grid[IX(i, j)].rho));
-                }
-            }
-            histogramCaption.textContent = `Density histogram`;
-            xHistogramLabel.textContent = "Density";
-            break;
-
-        case "ux":
-            for (let i = 0; i < NX; i++) {
-                for (let j = 0; j < NY; j++) {
-                    data.push((grid[IX(i, j)].ux));
-                }
-            }
-            histogramCaption.textContent = `X velocity histogram`;
-            xHistogramLabel.textContent = "X-Velocity";
-            break;
-        case "uy":
-            for (let i = 0; i < NX; i++) {
-                for (let j = 0; j < NY; j++) {
-                    data.push((grid[IX(i, j)].uy));
-                }
-            }
-            histogramCaption.textContent = `Y-velocity histogram`;
-            xHistogramLabel.textContent = "Y-Velocity";
-
-
-            break;
-        default:
-            for (let i = 2; i < NX - 2; i++) {
-                for (let j = 2; j < NY - 2; j++) {
-                    data.push((curl(i, j)));
-                }
-            }
-            histogramCaption.textContent = `Vorticity histogram`;
-            xHistogramLabel.textContent = "Vorticity";
-            break;
+    for (let i = 0; i < NX; i++) {
+        for (let j = 0; j < NY; j++) {
+            data.push((grid[IX(i, j)][plotSelection]));
+        }
     }
-
-
 
     let max = Math.max(...data);
     let min = Math.min(...data);
 
     let norm_data = data.map(x => ((x - min) / (max - min))).sort((a, b) => a - b);
     // let norm_data = [0, 0.1, 0.1, 0.2, 0.3, 0.4, 0.6];
-    let numBins = 1000;
+    let numBins = 500;
     let bins = [];
-    let range = [];
-
     for (let i = 1; i <= numBins; i++) {
-        range.push([(i - 1) / numBins, i / numBins]);
         bins.push(countInRange(norm_data, i / numBins, (i - 1) / numBins));
     }
     // graph data 
@@ -1689,15 +1456,14 @@ function plotHistogram() {
     hctx.lineTo(histogramWidth, histogramHeight);
     hctx.stroke();
 
-
     // draw tick marks 
-    // for (let i = 0; i <= 1; i += 0.1) {
-    //     hctx.beginPath();
-    //     hctx.moveTo(histogramWidth * i, histogramHeight);
-    //     hctx.lineTo(histogramWidth * i, histogramPlot.height * 0.9);
-    //     hctx.closePath();
-    //     hctx.stroke();
-    // }
+    for (let i = 0; i <= 1; i += 0.2) {
+        hctx.beginPath();
+        hctx.moveTo(histogramWidth * i, histogramHeight);
+        hctx.lineTo(histogramWidth * i, histogramPlot.height * 0.9);
+        hctx.closePath();
+        hctx.stroke();
+    }
 
 }
 let countInRange = function (array, h, l) {
@@ -1709,39 +1475,60 @@ let countInRange = function (array, h, l) {
     return count;
 }
 
+
+
+// ======================================================================================
+// draw flow lines 
+
+class flowLine {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    draw(context) {
+        let speedX = grid[IX(Math.round(NX * this.x / simulationCanvas.width), Math.round(NY * this.y / simulationCanvas.height))].ux;
+        let speedY = grid[IX(Math.round(NX * this.x / simulationCanvas.width), Math.round(NY * this.y / simulationCanvas.height))].uy; 
+        this.x += speedX*600;
+        this.y += speedY *600;
+        context.fillRect(this.x, this.y, 2 * speedX, 2);
+    }
+}
+
+
+function drawFlowLines() {
+    let particles = [];
+    
+    let X = simulationCanvas.width; 
+    let Y = simulationCanvas.height; 
+    for (let i = X/2 -20; i < X/2 + 20; i++) {
+        for (let j = Y/2 -20; j < Y/2 + 20; j++) {
+            particles.push(new flowLine(i, j));
+        }
+    }
+
+    particles.forEach(x => x.draw(ctx))
+
+}
+
+
 // ======================================================================================
 // ANIMATION LOOP 
 
 
-initialize();
 
+
+initialize();
 
 function simulate() {
     ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
+    let histogramColor = colorMaps[colorMapSelected](0.5);
+    hctx.fillStyle = histogramColor.substring(0, histogramColor.length - 1) + ',20%)';
+    gctx.strokeStyle = histogramColor.substring(0, histogramColor.length - 1) + ',20%)';
 
-    let c = 160;
-    switch (plotSelection) {
-        case "rho":
-            gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 121, 75, 20%)`;
-            hctx.fillStyle = `rgba(160, 121, 75, 1%)`;
-            break;
-        case "ux":
-            gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
-            hctx.fillStyle = `rgba(241, 109, 75, 1%)`;
-            break;
-        case "uy":
-            gctx.strokeStyle = `rgba(${241 * xPos.value / NX}, 109, 75, 20%)`;
-            hctx.fillStyle = `rgba(143, 124, 100, 1%)`;
-            break;
-        default:
-            gctx.strokeStyle = `rgba(${160 * xPos.value / NX}, 164, 209, 20%)`;
-            hctx.fillStyle = `rgba(127, 164, 229, 1%)`;
-            break;
-    }
     if (!trackHistory.checked) {
         gctx.strokeStyle = "rgb(0,0,0)";
         hctx.fillStyle = "rgb(0,0,0)";
-
         hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
         gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
     }
@@ -1757,9 +1544,13 @@ function simulate() {
             timeStep += i;
         }
     }
+
     draw(Number(xPos.value));
+    drawFlowLines();
+
     plotProfile(Number(xPos.value));
     plotHistogram();
+
     requestAnimationFrame(simulate);
 }
 
@@ -1785,38 +1576,22 @@ function curl(i, j) {
     return (grid[IX(i, j + 1)].ux - grid[IX(i, j - 1)].ux) - (grid[IX(i - 1, j)].uy - grid[IX(i - 1, j)].uy);
 }
 
-
-function getExtremum() {
-    let vorticity = [];
+function setCurl() {
     for (let i = 1; i < NX - 1; i++) {
         for (let j = 1; j < NY - 1; j++) {
-            vorticity.push(curl(i, j));
+            grid[IX(i, j)].vorticity = curl(i, j);
         }
+
     }
-
-    let maxVort = Math.max(...vorticity);
-    let minVort = Math.min(...vorticity);
-
-    let UxArray = grid.map(function (e) { return e.ux });
-    let maxUx = Math.max(...UxArray);
-    let minUx = Math.min(...UxArray);
-
-    let UyArray = grid.map(function (e) { return e.uy });
-
-    let maxUy = Math.max(...UyArray);
-    let minUy = Math.min(...UyArray);
+}
 
 
-    let rhoArray = grid.map(function (e) { return e.rho });
-
-    let maxRho = Math.max(...rhoArray);
-    let minRho = Math.min(...rhoArray);
-
+function getExtremum(plotSelection) {
+    let array = grid.map(function (e) { return e[plotSelection] });
+    let max = Math.max(...array);
+    let min = Math.min(...array);
     return {
-        rho: { max: maxRho, min: minRho },
-        uy: { max: maxUy, min: minUy },
-        ux: { max: maxUx, min: minUx },
-        vorticity: { max: maxVort, min: minVort },
+        max, min
     }
 }
 // =====================================================================================
@@ -1829,6 +1604,7 @@ simulationCanvas.addEventListener('click', (e) => {
     let y = Math.floor(e.offsetY / N);
     // obsXpos = mouse.i;
     // obsYpos = mouse.j;
+
     setObstacle(obsRadius, x - obsRadius, y - obsRadius, startAngle, endAngle, shapeSelection);
 
     // console.log(mouse.i, mouse.j);
@@ -1843,8 +1619,8 @@ for (let i = 0; i < plotOptionButtons.length; i++) {
             plotSelection = event.target.value;
             gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
             hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
-            setColorLegend();
         }
+        resetTitles(plotSelection);
     });
 }
 
@@ -1867,7 +1643,6 @@ const pauseIcon = document.getElementById("pauseIcon");
 const playIcon = document.getElementById("playIcon");
 
 playpausebtn.addEventListener('click', updatePausePlayButtons);
-
 function updatePausePlayButtons() {
     if (animating === false) {
         pauseIcon.style.display = "block";
@@ -1933,13 +1708,10 @@ playbackSpeed.addEventListener("click", () => {
 })
 
 const colorMapSelector = document.getElementById("colorMapSelector");
-
-colorMapSelector.addEventListener("change", function () {
-    setColorMap(this.value);
+colorMapSelector.addEventListener("change", function (e) {
+    colorMapSelected = e.target.value;
+    setColorLegend();
 });
-
-
-
 
 const resolutionSelector = document.getElementById('resolutionSelector');
 

@@ -68,11 +68,8 @@ input[type="range"] {
     top: 2.25%;
 }
 
-#fluidButtons {
-    /* display: flex; */
-}
 
-#videoControlButtons{ 
+#videoControlButtons {
     display: flex;
 }
 
@@ -86,7 +83,7 @@ input[type="range"] {
     background-color: #d9d9c7;
 }
 
-#resolutionSelector{
+#resolutionSelector {
     display: inline;
 
 }
@@ -196,7 +193,9 @@ input[type="radio"]:checked+.macroLabel {
     display: flex;
     flex-direction: column;
 }
-
+#reynoldsInput{
+    width: 50%;
+}
 #label {
     display: flex;
     gap: 5px;

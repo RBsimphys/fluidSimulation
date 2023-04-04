@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="main.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"></script>
 </head>
 
 <body>
 
+    
     <div id="simulation">
 
         <div id="plots">
@@ -198,6 +198,7 @@
 
 
             <div id="chartContainer">
+                
                 <figure class="chart">
                     <figcaption id="profilePlotCaption" class="figureCaption"></figcaption>
                     <canvas id="profilePlot"></canvas>
@@ -206,7 +207,7 @@
                 </figure>
 
                 <figure class="chart">
-                    <figcaption id="histogramCaption" class="figureCaption"></figcaption>
+                    <figcaption id="histogramCaption" class="figureCaption">histogram plot</figcaption>
                     <canvas id="histogramPlot"></canvas>
                     <p class="yLabel">count</p>
                     <p id="xHistogramLabel">velocity</p>
@@ -295,7 +296,7 @@
                         <option value="blackAndWhite">Black and white</option>
                         <option value="cubeHelix">Cubehelix</option>
                         <option value="dracula">Dracula</option>
-                        <option value="virdis">Virdis</option>
+                        <option value="virdis" selected="selected">Virdis</option>
                         <option value="magma">Magma</option>
                         <option value="inferno">Inferno</option>
                         <option value="plasma">Plasma</option>

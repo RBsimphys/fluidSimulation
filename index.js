@@ -1,7 +1,6 @@
 
-// import {stream, collide, initialize, setEquilibrium} from "/LBM.js"
 // ===================================================================================
-// SIMULATION CANVAS 
+// Canvas setup  
 const simulationCanvas = document.getElementById("simulationCanvas");
 const ctx = simulationCanvas.getContext("2d");
 simulationCanvas.width = 600;
@@ -9,11 +8,19 @@ simulationCanvas.height = 240;
 let N = 5;
 let NX = simulationCanvas.width / N;
 let NY = simulationCanvas.height / N;
+let simage = ctx.createImageData(NX * N, NY * N);
+for (var i = 0; i < simage.data.length; i += 4) {
+    simage.data[i + 3] = 255;      // set all alpha values to "opaque"
+}
+
+console.log(simage.data.length)
 let animating = true;
 
 // ======================================================================================
-// GRID SETUP STUFF  
-// velocity directions,
+// Fluid grid set up  
+
+
+//velocity directions
 const e = [
     [0, 0],                                   // 0
     [0, 1], [1, 1], [1, 0], [1, -1],          // N1, NE2, E3, SE4
@@ -36,7 +43,7 @@ const endAngle = Math.PI * 2;
 
 const Re = document.getElementById("reynoldsInput");
 const reynoldsDisplay = document.getElementById("reynoldsDisplay");
-let deltaT = 6;                             //time step
+let deltaT = 5;                             //time step
 let timeStep = 0;
 let ux0 = 0.2;                                //initial x velocity 
 let uy0 = 0;                                  //initial y velocity 
@@ -62,8 +69,8 @@ const Cell = (rho, ux, uy, isObstacle) => {
 let grid = new Array(NX * NY);
 
 function createGrid() {
-    for (let i = 0; i < NX; i++) {
-        for (let j = 0; j < NY; j++) {
+    for (let i = 0; i <= NX; i++) {
+        for (let j = 0; j <= NY; j++) {
             grid[IX(i, j)] = Cell(1, 0, 0, false);
         }
     }
@@ -72,7 +79,7 @@ function createGrid() {
 createGrid()
 
 
-function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape) {
+function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, rotationAngle, thickness) {
     clearObstacles();
     switch (shape) {
         case "line":
@@ -91,27 +98,40 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape) {
                 }
             };
             break;
-        // case "snake":
+        case "snake":
+            for (let x = 1; x <= 20; x++) {
+                for (let n = 1; n <= 5; n++) {
+                    for (let y = ypos; y <= ypos + radius; y++) {
+                        grid[IX(Math.round(xpos + x), Math.round(ypos - 3 - n - 2))].isObstacle = true;
+                        grid[IX(Math.round(xpos + x), Math.round(ypos + 3 + n + 2))].isObstacle = true;
+                    }
+                }
+            }
 
-        //     // for (let x = 1; x <= 40; x++) {
-        //     //     for (let y = 0; y < NY/2 - 8; y++) {
-        //     //         grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
-        //     //     }
-        //     // }
+            break;
 
-        //     // for (let x = 1; x <= 100; x++) {
-        //     //     for (let y = NY - 1; y >= NY/2 + 8 ; y--) {
-        //     //         grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
-        //     //     }
-        //     }
-        //     break;
+        case "hypotrochoid":
+            for (let t = 0; t < Math.PI * 10; t += 0.0001) {
+                let x = 2 * Math.cos(t) + 5 * Math.cos(2 * t / 3);
+                let y = 2 * Math.sin(t) - 5 * Math.sin(2 * t / 3);
+                grid[IX(Math.round(xpos + x), Math.round(ypos + y))].isObstacle = true;
+            }
+
+        case "airfoil":
+            // Parametric equation for airfoils, based on the paper by David Ziemkiewicz - https://arc.aiaa.org/doi/full/10.2514/1.J055986
+            let T = 0.5;
+            for (let t = 0.01; t < Math.PI * 2; t += 0.01) {
+                let x = 0.5 + (0.5 * (Math.cos(t) ** 2)) / Math.cos(t);
+                let y = (T / 2) * ((Math.sin(t) ** 2) / Math.sin(t)) * (1 - x) + 0.05 * Math.sin(x * Math.PI);
+                console.log(x, y);
+                grid[IX(Math.round(xpos + x * 20), Math.round(ypos + y * 10))].isObstacle = true;
+            }
         default:
+
         // code block
     }
 
-
 }
-
 // ======================================================================================
 // PHYSICS STUFF
 
@@ -150,10 +170,13 @@ function collide() {
             for (let n = 0; n < 9; n++) {
                 grid[index].fi[n] += omega * (feq[n] - grid[index].fi[n]);
             }
+
         }
     }
+
+
 }
-//  in-place stream function, with bounce back boundary condition  
+//  in-place streaming, with bounce back boundary condition  
 const fbounce = [0, 5, 6, 7, 8, 1, 2, 3, 4];
 function stream() {
     // N NE E SE S        
@@ -184,13 +207,14 @@ function stream() {
         }
     }
 
+
 }
 // ==================================================================================================
 //set obstacles 
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
-let shapeSelection = "circle";
+let shapeSelection = "line";
 
-setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "airfoil", 0);
 // ======================================================================================
 // DRAW STUFF  
 // COLOR MAPS  
@@ -1280,7 +1304,6 @@ const colorMaps = {
 let colorMapSelected = "virdis";
 
 function draw(posx) {
-    setCurl();
     let ext = getExtremum(plotSelection);
     let normalizedValue = 0;
     // color grid 
@@ -1288,13 +1311,15 @@ function draw(posx) {
         for (let j = 1; j < NY - 1; j++) {
             let index = IX(i, j);
             normalizedValue = (grid[index][plotSelection] - ext.min) / (ext.max - ext.min);
+
             ctx.fillStyle = colorMaps[colorMapSelected](normalizedValue);
+
             // color obstacles 
             if (grid[index].isObstacle) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 100%)';
             }
+
             ctx.fillRect(i * N, j * N, N, N);
-            // color graph position slider 
             if (i === posx) {
                 ctx.fillStyle = 'rgba(255, 205, 0, 50%)';
                 ctx.fillRect(i * N, j * N, N, N);
@@ -1302,13 +1327,21 @@ function draw(posx) {
         }
 
     }
-
+    // ctx.putImageData(simage, 0, 0);
     ctx.font = "10px Times New Roman";
     ctx.fillStyle = "rgba(0,0,100,90%)";
     ctx.fillText(`μ = ${Math.round(mu * 100) / 100}; [Ux,Uy] = [${ux0},${uy0}]; Δt:${deltaT}; step:${timeStep};`, 10, simulationCanvas.height - 10);
 
 }
 
+
+
+function setImageData(x, y, r, g, b, a) {
+    simage.data[x * (simage.width * 4) + y * 4] = r;
+    simage.data[x * (simage.width * 4) + y * 4 + 1] = g;
+    simage.data[x * (simage.width * 4) + y * 4 + 2] = b;
+    simage.data[x * (simage.width * 4) + y * 4 + 3] = a;
+}
 // color legend 
 const colorLegend = document.getElementById("colorMapLegend");
 const Ncolor = 15;
@@ -1346,10 +1379,14 @@ const gctx = profilePlot.getContext("2d");
 
 const profilePlotCaption = document.getElementById("profilePlotCaption");
 const xPos = document.getElementById("xPos");
+
 const profilePlotxLabel = document.getElementById("xLabel");
 const plotSelectionLegend = document.getElementById("plotSelectionLegend");
 
 const trackHistory = document.getElementById("trackHistory");
+
+const plotContours = document.getElementById("contourPlot");
+
 
 let plotWidth = 350;
 let plotHeight = 200;
@@ -1478,49 +1515,133 @@ let countInRange = function (array, h, l) {
 
 
 // ======================================================================================
-// draw flow lines 
+// draw countour lines - Marching squares algo based on Rephael Wenger book https://web.cse.ohio-state.edu/~wenger.4/ "Isosurfaces: Geometry, Topology, and Algorithms" chapter 2. 
+let isovalue = [];
 
-class flowLine {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    draw(context) {
-        let speedX = grid[IX(Math.round(NX * this.x / simulationCanvas.width), Math.round(NY * this.y / simulationCanvas.height))].ux;
-        let speedY = grid[IX(Math.round(NX * this.x / simulationCanvas.width), Math.round(NY * this.y / simulationCanvas.height))].uy; 
-        this.x += speedX*600;
-        this.y += speedY *600;
-        context.fillRect(this.x, this.y, 2 * speedX, 2);
-    }
+for (let i = 1; i < 2; i++) {
+    isovalue.push(i / 2);
 }
 
+function drawContour(isovalue) {
+    let ext = getExtremum(plotSelection);
+    let value = 0;
+    let booleanGrid = [];
+    let normGrid = [];
+    let state = 0;
+    // each side of a marching square; 
+    let a = { x: 0, y: 0 };
+    let b = { x: 0, y: 0 };
+    let c = { x: 0, y: 0 };
+    let d = { x: 0, y: 0 };
 
-function drawFlowLines() {
-    let particles = [];
-    
-    let X = simulationCanvas.width; 
-    let Y = simulationCanvas.height; 
-    for (let i = X/2 -20; i < X/2 + 20; i++) {
-        for (let j = Y/2 -20; j < Y/2 + 20; j++) {
-            particles.push(new flowLine(i, j));
+    for (let i = 0; i < NX; i++) {
+        for (let j = 0; j < NY; j++) {
+            value = (grid[IX(i, j)][plotSelection] - ext.min) / (ext.max - ext.min);
+            normGrid[IX(i, j)] = value;
+            if (value > isovalue) {
+                booleanGrid[IX(i, j)] = 1;
+            }
+            else {
+                booleanGrid[IX(i, j)] = 0;
+            }
         }
     }
 
-    particles.forEach(x => x.draw(ctx))
+    for (let i = 1; i < NX - 1; i++) {
+        for (let j = 1; j < NY - 1; j++) {
+            a.x = getDisp(i, j, i + 1, j, i, i + 1, normGrid, isovalue);
+            a.y = j;
 
+            b.x = i + 1;
+            b.y = getDisp(i + 1, j, i + 1, j + 1, j, j + 1, normGrid, isovalue);
+
+
+            c.x = getDisp(i + 1, j + 1, i, j + 1, i + 1, i, normGrid, isovalue);
+            c.y = j + 1;
+
+            d.x = i;
+            d.y = getDisp(i, j + 1, i, j, j + 1, j, normGrid, isovalue);
+
+            state = booleanGrid[IX(i, j)] * 8 + booleanGrid[IX(i + 1, j)] * 4 + booleanGrid[IX(i, j + 1)] * 1 + booleanGrid[IX(i + 1, j + 1)] * 2;
+            (isolines[state] || isolines[1])(a, b, c, d);
+
+        }
+    }
 }
 
+var getDisp = function (x0, y0, x1, y1, c1, c2, grid, isovalue) {
+    let sigma = (isovalue - grid[IX(x0, y0)]) / (grid[IX(x1, y1)] - grid[IX(x0, y0)]);
+    let disp = (1 - sigma) * c1 + sigma * c2;
+    return disp;
+};
 
-// ======================================================================================
+
+let isolines = {
+    0: () => { },
+    1: (a, b, c, d) => {
+        drawLine(d, c);
+    },
+    2: (a, b, c, d) => {
+        drawLine(b, c);
+    },
+    3: (a, b, c, d) => {
+        drawLine(d, b);
+    },
+    4: (a, b, c, d) => {
+        drawLine(a, b);
+    },
+    5: (a, b, c, d) => {
+        drawLine(a, d);
+        drawLine(b, c);
+    },
+    6: (a, b, c, d) => {
+        drawLine(a, c);
+    },
+    7: (a, b, c, d) => {
+        drawLine(a, d);
+    },
+    8: (a, b, c, d) => {
+        drawLine(a, d);
+    },
+    9: (a, b, c, d) => {
+        drawLine(a, c);
+    },
+    10: (a, b, c, d) => {
+        drawLine(a, b);
+        drawLine(d, c);
+    },
+    11: (a, b, c, d) => {
+        drawLine(a, b);
+    },
+    12: (a, b, c, d) => {
+        drawLine(d, b);
+    },
+    13: (a, b, c, d) => {
+        drawLine(b, c);
+    },
+    14: (a, b, c, d) => {
+        drawLine(d, c);
+    },
+    15: (a, b, c, d) => {
+    },
+
+};
+
+function drawLine(p1, p2) {
+    ctx.beginPath();
+    ctx.moveTo(p1.x * N, p1.y * N);
+    ctx.lineTo(p2.x * N, p2.y * N);
+    ctx.stroke();
+}
+
+//==========================================================================
 // ANIMATION LOOP 
-
-
 
 
 initialize();
 
 function simulate() {
+    setCurl();
     ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
     let histogramColor = colorMaps[colorMapSelected](0.5);
     hctx.fillStyle = histogramColor.substring(0, histogramColor.length - 1) + ',20%)';
@@ -1536,7 +1657,7 @@ function simulate() {
     if (animating) {
         mu = ux0 * obsRadius / Re.value;            //update viscosity
         omega = 1 / (3 * mu + 0.5);                 //update relaxation parameter
-        reynoldsDisplay.textContent = `Re: ${Re.value}`
+        reynoldsDisplay.textContent = `Reynolds number: ${Re.value}`
 
         for (let i = 1; i < deltaT; i++) {
             collide();
@@ -1545,16 +1666,26 @@ function simulate() {
         }
     }
 
-    draw(Number(xPos.value));
-    drawFlowLines();
 
+    if (!plotContours.checked) draw(Number(xPos.value));
     plotProfile(Number(xPos.value));
     plotHistogram();
 
+    if (plotContours.checked) {
+        for (let i = 0; i < isovalue.length; i++) {
+            ctx.strokeStyle = colorMaps[colorMapSelected](isovalue[i]);
+            ctx.lineWidth = 1.3;
+            drawContour(isovalue[i]);
+        }
+    }
+
+
+    // setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "airfoil", rotationAngle);
     requestAnimationFrame(simulate);
 }
 
 simulate();
+
 
 
 // =============================================================
@@ -1599,14 +1730,14 @@ function getExtremum(plotSelection) {
 
 simulationCanvas.addEventListener('click', (e) => {
     e.preventDefault();
-    clearObstacles();
+    // clearObstacles();
     let x = Math.floor(e.offsetX / N);
     let y = Math.floor(e.offsetY / N);
     // obsXpos = mouse.i;
     // obsYpos = mouse.j;
 
     setObstacle(obsRadius, x - obsRadius, y - obsRadius, startAngle, endAngle, shapeSelection);
-
+    // particles.push(new Particle(x, y))
     // console.log(mouse.i, mouse.j);
     console.log(grid[IX(x, y)]);
 
@@ -1670,18 +1801,21 @@ function clearObstacles() {
 
 function resetSimulation() {
     initialize();
-    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "line");
     hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
     gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
     timeStep = 0;
 }
 
 
-xPos.addEventListener("change", () => gctx.clearRect(0, 0, profilePlot.width, profilePlot.height))
+xPos.addEventListener("change", () => gctx.clearRect(0, 0, profilePlot.width, profilePlot.height));
+
 trackHistory.addEventListener('change', () => {
     hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
     gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
 });
+
+
 
 
 const playbackSpeed = document.getElementById("playbackSpeed");
@@ -1716,17 +1850,19 @@ colorMapSelector.addEventListener("change", function (e) {
 const resolutionSelector = document.getElementById('resolutionSelector');
 
 function updateResolution() {
-
     N = resolutionSelector.value;
     NX = simulationCanvas.width / N;
     NY = simulationCanvas.height / N;
-
     obsRadius = NY * 0.1;
     obsXpos = NX * 0.1;
     obsYpos = NY * 0.5;
     createGrid();
     initialize();
-    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "circle");
+    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0);
+
+    xPos.max = NX;
 }
 
-resolutionSelector.addEventListener("change", updateResolution)
+resolutionSelector.addEventListener("change", updateResolution);
+
+

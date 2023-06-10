@@ -10,8 +10,6 @@
 </head>
 
 <body>
-
-    
     <div id="simulation">
 
         <div id="plots">
@@ -22,172 +20,173 @@
                     <canvas id="colorMapLegend"></canvas>
                 </figure>
                 <div id="fluidButtons">
-                    <div id = "videoControlButtons"> 
-                    <button id="playbackSpeed">x1</button>
-                    <button id="playpausebtn">
-                        <svg id="playIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
-                            id="svg934" inkscape: version="1.1.2 (0a00cf5339, 2022-02-04)" sodipodi:
-                            docname="pausebtn.svg" xmlns: inkscape="http://www.inkscape.org/namespaces/inkscape"
-                            xmlns: sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                            xmlns="http://www.w3.org/2000/svg" xmlns: svg="http://www.w3.org/2000/svg">
-                            <sodipodi:namedview id="namedview936" pagecolor="#ffffff" bordercolor="#666666"
-                                borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
-                                inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
-                                units="px" inkscape:zoom="29.423234" inkscape:cx="8.0718524" inkscape:cy="11.096673"
-                                inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
-                                inkscape:window-y="0" inkscape:window-maximized="1"
-                                inkscape:current-layer="layer1" />
-                            <defs id="defs931">
-                                <inkscape:path-effect effect="powerstroke" id="path-effect1550" is_visible="true"
-                                    lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
-                                    interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
-                                    start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
-                                    scale_width="1" end_linecap_type="zerowidth" />
-                                <inkscape:path-effect effect="powerstroke" id="path-effect1546" is_visible="true"
-                                    lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
-                                    interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
-                                    start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
-                                    scale_width="1" end_linecap_type="zerowidth" />
-                                <inkscape:path-effect effect="powerstroke" id="path-effect1509" is_visible="true"
-                                    lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
-                                    interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
-                                    start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
-                                    scale_width="1" end_linecap_type="zerowidth" />
-                                <inkscape:path-effect effect="spiro" id="path-effect1472" is_visible="true"
-                                    lpeversion="1" />
-                            </defs>
-                            <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
-                                <path
-                                    style="fill:#333333;stroke:none;stroke-width:0.290612px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                                    d="M 4.9635744,2.3080673 1.0179946,5.2954266 V 0.01823053 Z" id="path2738"
-                                    sodipodi:nodetypes="cccc" />
-                            </g>
-                        </svg>
-                        <svg id="pauseIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
-                            id="svg934" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-                            sodipodi:docname="pausebtn.svg"
-                            xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                            xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-                            <sodipodi:namedview id="namedview936" pagecolor="#ffffff" bordercolor="#666666"
-                                borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
-                                inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
-                                units="px" inkscape:zoom="28.531759" inkscape:cx="10.006393" inkscape:cy="9.2002741"
-                                inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
-                                inkscape:window-y="0" inkscape:window-maximized="1"
-                                inkscape:current-layer="layer1" />
-                            <defs id="defs931" />
-                            <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
-                                <g id="g1308" transform="translate(-0.02321918,-0.00257586)">
-                                    <rect
-                                        style="fill:#4b4b4b;stroke:none;stroke-width:0.660467;stroke-linejoin:bevel;paint-order:stroke fill markers"
-                                        id="rect1043" width="1.2865191" height="5.2948866" x="0.97155529"
-                                        y="0.00096589467" />
-                                    <rect
-                                        style="fill:#4b4b4b;stroke:none;stroke-width:0.660467;stroke-linejoin:bevel;paint-order:stroke fill markers"
-                                        id="rect1043-6" width="1.2865191" height="5.2948866" x="3.0800307"
-                                        y="0.00096589467" />
+
+                    <div id="videoControlButtons">
+                        <button id="playbackSpeed">x1</button>
+                        <button id="playpausebtn">
+                            <svg id="playIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
+                                id="svg934" inkscape: version="1.1.2 (0a00cf5339, 2022-02-04)" sodipodi:
+                                docname="pausebtn.svg" xmlns: inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns: sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns: svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview936" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    units="px" inkscape:zoom="29.423234" inkscape:cx="8.0718524" inkscape:cy="11.096673"
+                                    inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
+                                    inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1" />
+                                <defs id="defs931">
+                                    <inkscape:path-effect effect="powerstroke" id="path-effect1550" is_visible="true"
+                                        lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
+                                        interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
+                                        start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
+                                        scale_width="1" end_linecap_type="zerowidth" />
+                                    <inkscape:path-effect effect="powerstroke" id="path-effect1546" is_visible="true"
+                                        lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
+                                        interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
+                                        start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
+                                        scale_width="1" end_linecap_type="zerowidth" />
+                                    <inkscape:path-effect effect="powerstroke" id="path-effect1509" is_visible="true"
+                                        lpeversion="1" offset_points="0,4.99214" not_jump="false" sort_points="true"
+                                        interpolator_type="CubicBezierJohan" interpolator_beta="0.2"
+                                        start_linecap_type="zerowidth" linejoin_type="extrp_arc" miter_limit="4"
+                                        scale_width="1" end_linecap_type="zerowidth" />
+                                    <inkscape:path-effect effect="spiro" id="path-effect1472" is_visible="true"
+                                        lpeversion="1" />
+                                </defs>
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
+                                    <path
+                                        style="fill:#333333;stroke:none;stroke-width:0.290612px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                                        d="M 4.9635744,2.3080673 1.0179946,5.2954266 V 0.01823053 Z" id="path2738"
+                                        sodipodi:nodetypes="cccc" />
                                 </g>
-                            </g>
-                        </svg>
-                    </button>
-                    <button id="replay">
-                        <svg width="20" height="20" viewBox="0 0 5.2916664 5.2916667" version="1.1" id="svg5"
-                            sodipodi:docname="replay.svg" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-                            xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                            xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-                            <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
-                                borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
-                                inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
-                                fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"
-                                inkscape:zoom="38.19049" inkscape:cx="7.816082" inkscape:cy="9.9370288"
-                                inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
-                                inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="layer1"
-                                units="mm" width="20px" />
-                            <defs id="defs2">
-                                <inkscape:path-effect effect="spiro" id="path-effect943" is_visible="true"
-                                    lpeversion="1" />
-                                <marker style="overflow:visible" id="TriangleOutL" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="TriangleOutL" inkscape:isstock="true">
-                                    <path transform="scale(0.8)"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-                                        d="M 5.77,0 -2.88,5 V -5 Z" id="path3178" />
-                                </marker>
-                                <inkscape:path-effect effect="spiro" id="path-effect3844" is_visible="true"
-                                    lpeversion="1" />
-                                <marker style="overflow:visible" id="marker3547" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Arrow2Lend" inkscape:isstock="true">
-                                    <path transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
-                                        d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
-                                        id="path3545" />
-                                </marker>
-                                <marker style="overflow:visible" id="Tail" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Tail" inkscape:isstock="true">
-                                    <g transform="scale(-1.2)" id="g3084">
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M -3.8048674,-3.9585227 0.54352094,0" id="path3072" />
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M -1.2866832,-3.9585227 3.0617053,0" id="path3074" />
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M 1.3053582,-3.9585227 5.6537466,0" id="path3076" />
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M -3.8048674,4.1775838 0.54352094,0.21974226" id="path3078" />
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M -1.2866832,4.1775838 3.0617053,0.21974226" id="path3080" />
-                                        <path
-                                            style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
-                                            d="M 1.3053582,4.1775838 5.6537466,0.21974226" id="path3082" />
+                            </svg>
+                            <svg id="pauseIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
+                                id="svg934" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                sodipodi:docname="pausebtn.svg"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview936" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    units="px" inkscape:zoom="28.531759" inkscape:cx="10.006393" inkscape:cy="9.2002741"
+                                    inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
+                                    inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1" />
+                                <defs id="defs931" />
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
+                                    <g id="g1308" transform="translate(-0.02321918,-0.00257586)">
+                                        <rect
+                                            style="fill:#4b4b4b;stroke:none;stroke-width:0.660467;stroke-linejoin:bevel;paint-order:stroke fill markers"
+                                            id="rect1043" width="1.2865191" height="5.2948866" x="0.97155529"
+                                            y="0.00096589467" />
+                                        <rect
+                                            style="fill:#4b4b4b;stroke:none;stroke-width:0.660467;stroke-linejoin:bevel;paint-order:stroke fill markers"
+                                            id="rect1043-6" width="1.2865191" height="5.2948866" x="3.0800307"
+                                            y="0.00096589467" />
                                     </g>
-                                </marker>
-                                <marker style="overflow:visible" id="Arrow1Lend" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Arrow1Lend" inkscape:isstock="true">
-                                    <path transform="matrix(-0.8,0,0,-0.8,-10,0)"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-                                        d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3039" />
-                                </marker>
-                                <marker style="overflow:visible" id="marker3497" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Arrow1Lstart" inkscape:isstock="true">
-                                    <path transform="matrix(0.8,0,0,0.8,10,0)"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-                                        d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3495" />
-                                </marker>
-                                <marker style="overflow:visible" id="Arrow2Lend" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Arrow2Lend" inkscape:isstock="true">
-                                    <path transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
-                                        d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
-                                        id="path3057" />
-                                </marker>
-                                <marker style="overflow:visible" id="Arrow1Lstart" refX="0" refY="0" orient="auto"
-                                    inkscape:stockid="Arrow1Lstart" inkscape:isstock="true">
-                                    <path transform="matrix(0.8,0,0,0.8,10,0)"
-                                        style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
-                                        d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3036" />
-                                </marker>
-                                <inkscape:path-effect effect="spiro" id="path-effect3306" is_visible="true"
-                                    lpeversion="1" />
-                            </defs>
-                            <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
-                                transform="translate(-105.55048,-98.31888)">
-                                <path
-                                    style="fill:#1a1a1a;stroke:none;stroke-width:0.266934px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-                                    d="m 109.25449,102.32733 c -0.17322,0.26229 -0.43215,0.46696 -0.72736,0.57493 -0.2952,0.10796 -0.62509,0.11863 -0.92665,0.03 -0.30574,-0.0899 -0.58065,-0.28146 -0.77083,-0.53716 -0.19019,-0.25571 -0.29458,-0.57411 -0.29271,-0.89278 0.002,-0.31868 0.10999,-0.63582 0.30316,-0.88928 0.19317,-0.25346 0.47031,-0.4418 0.77708,-0.52809 l 0.0453,1.73357 2.8528,-1.979715 -2.96653,-1.504675 0.0435,1.303638 c -0.39237,0.07133 -0.7617,0.264529 -1.04405,0.546162 -0.39564,0.39463 -0.61164,0.96281 -0.57808,1.52061 0.0336,0.5578 0.31612,1.09598 0.75622,1.44033 0.4401,0.34436 1.03044,0.48918 1.57994,0.38758 0.54949,-0.10159 1.04904,-0.44791 1.33692,-0.92686 l -0.38861,-0.27823 z"
-                                    id="path941" inkscape:path-effect="#path-effect943"
-                                    inkscape:original-d="m 109.25449,102.32733 c 0,0 -1.10242,0.40355 -1.65401,0.6049 -0.55162,0.20138 0.0167,-2.84731 0.0167,-2.84731 0,0 0.0453,1.73357 0.0453,1.73357 0,0 2.8528,-1.979715 2.8528,-1.979715 0,0 -2.96653,-1.504675 -2.96653,-1.504675 0,0 0.0435,1.303638 0.0435,1.303638 0,0 -0.69577,0.364372 -1.04405,0.546162 -0.34829,0.18178 3.095,2.42166 3.095,2.42166 0,0 -0.38861,-0.27823 -0.38861,-0.27823 z" />
-                            </g>
-                        </svg>
-                    </button>
+                                </g>
+                            </svg>
+                        </button>
+                        <button id="replay">
+                            <svg width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1" id="svg5"
+                                sodipodi:docname="replay.svg" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"
+                                    inkscape:zoom="38.19049" inkscape:cx="7.816082" inkscape:cy="9.9370288"
+                                    inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
+                                    inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="layer1"
+                                    units="mm" width="20px" />
+                                <defs id="defs2">
+                                    <inkscape:path-effect effect="spiro" id="path-effect943" is_visible="true"
+                                        lpeversion="1" />
+                                    <marker style="overflow:visible" id="TriangleOutL" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="TriangleOutL" inkscape:isstock="true">
+                                        <path transform="scale(0.8)"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+                                            d="M 5.77,0 -2.88,5 V -5 Z" id="path3178" />
+                                    </marker>
+                                    <inkscape:path-effect effect="spiro" id="path-effect3844" is_visible="true"
+                                        lpeversion="1" />
+                                    <marker style="overflow:visible" id="marker3547" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Arrow2Lend" inkscape:isstock="true">
+                                        <path transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+                                            d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
+                                            id="path3545" />
+                                    </marker>
+                                    <marker style="overflow:visible" id="Tail" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Tail" inkscape:isstock="true">
+                                        <g transform="scale(-1.2)" id="g3084">
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M -3.8048674,-3.9585227 0.54352094,0" id="path3072" />
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M -1.2866832,-3.9585227 3.0617053,0" id="path3074" />
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M 1.3053582,-3.9585227 5.6537466,0" id="path3076" />
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M -3.8048674,4.1775838 0.54352094,0.21974226" id="path3078" />
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M -1.2866832,4.1775838 3.0617053,0.21974226" id="path3080" />
+                                            <path
+                                                style="fill:none;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.8;stroke-linecap:round"
+                                                d="M 1.3053582,4.1775838 5.6537466,0.21974226" id="path3082" />
+                                        </g>
+                                    </marker>
+                                    <marker style="overflow:visible" id="Arrow1Lend" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Arrow1Lend" inkscape:isstock="true">
+                                        <path transform="matrix(-0.8,0,0,-0.8,-10,0)"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+                                            d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3039" />
+                                    </marker>
+                                    <marker style="overflow:visible" id="marker3497" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Arrow1Lstart" inkscape:isstock="true">
+                                        <path transform="matrix(0.8,0,0,0.8,10,0)"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+                                            d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3495" />
+                                    </marker>
+                                    <marker style="overflow:visible" id="Arrow2Lend" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Arrow2Lend" inkscape:isstock="true">
+                                        <path transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+                                            d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:0.625;stroke-linejoin:round"
+                                            id="path3057" />
+                                    </marker>
+                                    <marker style="overflow:visible" id="Arrow1Lstart" refX="0" refY="0" orient="auto"
+                                        inkscape:stockid="Arrow1Lstart" inkscape:isstock="true">
+                                        <path transform="matrix(0.8,0,0,0.8,10,0)"
+                                            style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+                                            d="M 0,0 5,-5 -12.5,0 5,5 Z" id="path3036" />
+                                    </marker>
+                                    <inkscape:path-effect effect="spiro" id="path-effect3306" is_visible="true"
+                                        lpeversion="1" />
+                                </defs>
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-105.55048,-98.31888)">
+                                    <path
+                                        style="fill:#1a1a1a;stroke:none;stroke-width:0.266934px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+                                        d="m 109.25449,102.32733 c -0.17322,0.26229 -0.43215,0.46696 -0.72736,0.57493 -0.2952,0.10796 -0.62509,0.11863 -0.92665,0.03 -0.30574,-0.0899 -0.58065,-0.28146 -0.77083,-0.53716 -0.19019,-0.25571 -0.29458,-0.57411 -0.29271,-0.89278 0.002,-0.31868 0.10999,-0.63582 0.30316,-0.88928 0.19317,-0.25346 0.47031,-0.4418 0.77708,-0.52809 l 0.0453,1.73357 2.8528,-1.979715 -2.96653,-1.504675 0.0435,1.303638 c -0.39237,0.07133 -0.7617,0.264529 -1.04405,0.546162 -0.39564,0.39463 -0.61164,0.96281 -0.57808,1.52061 0.0336,0.5578 0.31612,1.09598 0.75622,1.44033 0.4401,0.34436 1.03044,0.48918 1.57994,0.38758 0.54949,-0.10159 1.04904,-0.44791 1.33692,-0.92686 l -0.38861,-0.27823 z"
+                                        id="path941" inkscape:path-effect="#path-effect943"
+                                        inkscape:original-d="m 109.25449,102.32733 c 0,0 -1.10242,0.40355 -1.65401,0.6049 -0.55162,0.20138 0.0167,-2.84731 0.0167,-2.84731 0,0 0.0453,1.73357 0.0453,1.73357 0,0 2.8528,-1.979715 2.8528,-1.979715 0,0 -2.96653,-1.504675 -2.96653,-1.504675 0,0 0.0435,1.303638 0.0435,1.303638 0,0 -0.69577,0.364372 -1.04405,0.546162 -0.34829,0.18178 3.095,2.42166 3.095,2.42166 0,0 -0.38861,-0.27823 -0.38861,-0.27823 z" />
+                                </g>
+                            </svg>
+                        </button>
                     </div>
                     <select id="resolutionSelector">
-                        <option value="4">HD</option>
-                        <option value="6" selected="selected">MD</option>
+                        <option value="3">HD</option>
+                        <option value="5" selected="selected">MD</option>
                         <option value="10">SD</option>
                     </select>
                 </div>
@@ -198,7 +197,7 @@
 
 
             <div id="chartContainer">
-                
+
                 <figure class="chart">
                     <figcaption id="profilePlotCaption" class="figureCaption"></figcaption>
                     <canvas id="profilePlot"></canvas>
@@ -233,33 +232,7 @@
                 <div class="selectionForm">
                     <legend id="shapeSelectionLegend">Shape:</legend>
                     <form id="shapeSelectionForm">
-                        <input type="radio" id="circle" name="plotOption" value="circle" checked>
-                        <label class="macroLabel" for="circle">
-                            <svg width="18.791624" height="17.203541" viewBox="0 0 4.9719504 4.5517703" version="1.1"
-                                id="svg5" sodipodi:docname="circle.svg"
-                                inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
-                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
-                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
-                                    units="px" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0"
-                                    fit-margin-bottom="0" inkscape:zoom="5.6819697" inkscape:cx="-2.9039226"
-                                    inkscape:cy="-11.703688" inkscape:window-width="1920" inkscape:window-height="1016"
-                                    inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1"
-                                    inkscape:current-layer="layer1" />
-                                <defs id="defs2" />
-                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
-                                    transform="translate(-75.342173,-91.985231)">
-                                    <ellipse
-                                        style="fill:#f2f2f2;stroke-width:0.913;stroke-linejoin:round;stroke-miterlimit:0;paint-order:stroke fill markers;stroke:#000000;stroke-opacity:1;stroke-dasharray:none"
-                                        id="path1141" cx="77.828148" cy="94.261116" rx="1.6041425" ry="1.5886813" />
-                                </g>
-                            </svg>
-
-                        </label>
-                        <input type="radio" id="line" name="plotOption" value="line">
+                        <input type="radio" id="line" name="plotOption" value="line" checked>
                         <label class="macroLabel" for="line">
 
                             <svg width="18.791624" height="17.203541" viewBox="0 0 4.9719504 4.5517703" version="1.1"
@@ -287,6 +260,120 @@
                             </svg>
 
                         </label>
+                        <input type="radio" id="circle" name="plotOption" value="circle">
+                        <label class="macroLabel" for="circle">
+                            <svg width="18.791624" height="17.203541" viewBox="0 0 4.9719504 4.5517703" version="1.1"
+                                id="svg5" sodipodi:docname="circle.svg"
+                                inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    units="px" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0"
+                                    fit-margin-bottom="0" inkscape:zoom="5.6819697" inkscape:cx="-2.9039226"
+                                    inkscape:cy="-11.703688" inkscape:window-width="1920" inkscape:window-height="1016"
+                                    inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1" />
+                                <defs id="defs2" />
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-75.342173,-91.985231)">
+                                    <ellipse
+                                        style="fill:#f2f2f2;stroke-width:0.913;stroke-linejoin:round;stroke-miterlimit:0;paint-order:stroke fill markers;stroke:#000000;stroke-opacity:1;stroke-dasharray:none"
+                                        id="path1141" cx="77.828148" cy="94.261116" rx="1.6041425" ry="1.5886813" />
+                                </g>
+                            </svg>
+                        </label>
+                        <input type="radio" id="snake" name="plotOption" value="snake">
+                        <label class="macroLabel" for="snake">
+
+                            <svg width="16.538591" height="16.001896" viewBox="0 0 16.538591 16.001895" version="1.1"
+                                id="svg5" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                sodipodi:docname="shape3.svg"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"
+                                    inkscape:zoom="5.6956839" inkscape:cx="18.522798" inkscape:cy="30.637234"
+                                    inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
+                                    inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1-5" width="18.79162mm" height="17.20354mm"
+                                    units="mm" />
+                                <defs id="defs2">
+                                    <inkscape:path-effect effect="spiro" id="path-effect901" is_visible="true"
+                                        lpeversion="1" />
+                                </defs>
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-93.062237,-80.600734)">
+                                    <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1-5"
+                                        transform="matrix(0.26458333,0,0,0.26458333,71.69825,55.576704)">
+                                        <g id="g1332" transform="matrix(4.274805,0,0,4.274805,-255.13711,-308.38546)"
+                                            style="stroke-width:0.80898842;stroke-miterlimit:0;stroke-dasharray:none">
+                                            <rect
+                                                style="fill:#ffffff;stroke:#000000;stroke-width:3.092;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;paint-order:stroke fill markers"
+                                                id="rect1213" width="12.487005" height="3.3851035" x="79.640396"
+                                                y="95.33271" />
+                                            <rect
+                                                style="fill:#ffffff;stroke:#000000;stroke-width:3.092;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;paint-order:stroke fill markers"
+                                                id="rect1213-3" width="12.487005" height="3.3851035" x="79.640396"
+                                                y="103.9601" />
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+
+
+                        </label>
+
+                        <input type="radio" id="airfoil" name="plotOption" value="airfoil">
+                        <label class="macroLabel" for="airfoil">
+                            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                            <svg width="16.538591mm" height="16.001896mm" viewBox="0 0 16.538591 16.001895"
+                                version="1.1" id="svg5" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                                sodipodi:docname="shape3.svg"
+                                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                                xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#666666"
+                                    borderopacity="1.0" inkscape:pageshadow="2" inkscape:pageopacity="0.0"
+                                    inkscape:pagecheckerboard="0" inkscape:document-units="mm" showgrid="false"
+                                    fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"
+                                    inkscape:zoom="8.1670977" inkscape:cx="40.712137" inkscape:cy="39.855039"
+                                    inkscape:window-width="1920" inkscape:window-height="1016" inkscape:window-x="0"
+                                    inkscape:window-y="0" inkscape:window-maximized="1"
+                                    inkscape:current-layer="layer1-5" width="18.79162mm" height="17.20354mm"
+                                    units="mm" />
+                                <defs id="defs2">
+                                    <inkscape:path-effect effect="spiro" id="path-effect949" is_visible="true"
+                                        lpeversion="1" />
+                                    <inkscape:path-effect effect="spiro" id="path-effect945" is_visible="true"
+                                        lpeversion="1" />
+                                    <inkscape:path-effect effect="spiro" id="path-effect941" is_visible="true"
+                                        lpeversion="1" />
+                                    <inkscape:path-effect effect="spiro" id="path-effect901" is_visible="true"
+                                        lpeversion="1" />
+                                </defs>
+                                <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+                                    transform="translate(-93.062237,-80.600734)">
+                                    <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1-5"
+                                        transform="matrix(0.26458333,0,0,0.26458333,71.69825,55.576704)">
+                                        <path
+                                            style="fill:#ffffff;stroke:#000000;stroke-width:2.51338586;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"
+                                            d="m 120.27723,118.61628 c -3.24908,-0.18094 -6.4904,-0.55299 -9.68044,-1.19557 -2.86666,-0.57744 -5.70127,-1.37445 -8.61517,-1.62015 -2.913896,-0.2457 -5.983196,0.10784 -8.455048,1.67025 -1.299646,0.82148 -2.402398,1.96838 -3.110104,3.33332 -0.707706,1.36494 -1.00989,2.9483 -0.78539,4.46932 0.174381,1.18146 0.660262,2.30849 1.351172,3.28261 0.69091,0.97411 1.583301,1.79775 2.576919,2.46031 1.987236,1.32511 4.341423,1.99561 6.695361,2.40058 6.33307,1.08954 12.96923,0.35572 18.91125,-2.09118 5.94202,-2.44689 11.17058,-6.59891 14.89997,-11.83213 -0.71576,-0.11309 -1.43416,-0.20954 -2.1544,-0.28925 -3.86031,-0.42723 -7.75625,-0.37216 -11.63412,-0.58811 z"
+                                            id="path939" inkscape:path-effect="#path-effect941"
+                                            inkscape:original-d="m 120.27723,118.61628 c -3.22581,-0.20818 28.08426,6.66315 -9.68044,-1.19557 -5.56978,-1.15905 -15.77272,-2.55178 -17.070218,0.0501 -1.297498,2.60188 -7.437643,5.08714 -3.895494,7.80264 3.54215,2.7155 7.0833,5.43 10.623452,8.1435 3.54015,2.7135 22.26887,-9.81043 33.81122,-13.92331 0.69825,0.39681 -2.0318,0.90381 -2.1544,-0.28925 -0.12261,-1.19285 -8.40831,-0.37993 -11.63412,-0.58811 z"
+                                            sodipodi:nodetypes="sssssccs" />
+                                    </g>
+                                </g>
+                            </svg>
+
+                        </label>
+
+
                     </form>
                 </div>
                 <div class="selectionForm">
@@ -307,13 +394,19 @@
             </div>
 
 
-            <label for="reynoldsInput" id='reLabel'><span id="reynoldsDisplay"> </span>
+            <label for="reynoldsInput" id='reLabel'><span id="reynoldsDisplay"></span>
                 <input type="range" min="10" max="100" step="0.5" value="70" id="reynoldsInput">
             </label>
 
-            <label for="trackHistory" class="label">track history:
-                <input type="checkbox" id="trackHistory">
-            </label>
+            <div id="checkBoxes">
+                <label for="trackHistory" class="label">track history:
+                    <input type="checkbox" id="trackHistory">
+                </label>
+
+                <label for="contourPlot" class="label">Plot contours:
+                    <input type="checkbox" id="contourPlot">
+                </label>
+            </div>
         </fieldset>
 
     </div>

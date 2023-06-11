@@ -78,7 +78,7 @@ function createGrid() {
 
 createGrid()
 let T = 0;
-let c = 0.2;
+let c = 0.1;
 // Obstacle 
 
 function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {

@@ -77,40 +77,50 @@ function createGrid() {
 }
 
 createGrid()
+let T = 0;
+let c = 0.2;
+// Obstacle 
 
-
-function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, rotationAngle, thickness) {
+function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
     clearObstacles();
+    if (moving) {
+        incrementPosition();
+    } else {
+        T = 0;
+    }
+
     switch (shape) {
         case "line":
             for (let x = 1; x <= 2; x++) {
                 for (let y = ypos - radius; y <= ypos + radius; y++) {
-                    grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
+                    grid[IX(Math.round(xpos + x), Math.round(y+T*10))].isObstacle = true;
                 }
             }
             break;
         case "circle":
-            for (let angle = startAngle; angle < endAngle; angle += 0.01) {
-                for (let i = 0; i < radius; i++) {
-                    let x = xpos + i * Math.cos(angle);
-                    let y = ypos + i * Math.sin(angle);
-                    grid[IX(Math.round(x), Math.round(y))].isObstacle = true;
+
+            for (let t = 0; t < Math.PI * 2; t += 0.01) {
+                for (let n = 0; n < radius; n++) {
+                    let x = xpos + n * Math.cos(t);
+                    let y = ypos + n * Math.sin(t);
+                    grid[IX(Math.round(x + 10 * T), Math.round(y))].isObstacle = true;
+
                 }
             };
+
             break;
-        case "snake":
-            for (let x = 1; x <= 20; x++) {
-                for (let n = 1; n <= 5; n++) {
-                    for (let y = ypos; y <= ypos + radius; y++) {
-                        grid[IX(Math.round(xpos + x), Math.round(ypos - 3 - n - 2))].isObstacle = true;
-                        grid[IX(Math.round(xpos + x), Math.round(ypos + 3 + n + 2))].isObstacle = true;
-                    }
-                }
+        case "astroid":
+            let theta = T * Math.PI * 2;
+            for (let t = 0; t <= Math.PI * 2; t += 0.01) {
+                let x = (Math.cos(t) ** 3) * Math.cos(theta) - (Math.sin(t) ** 3) * Math.sin(theta);
+                let y = Math.sin(theta) * (Math.cos(t) ** 3) + Math.cos(theta) * (Math.sin(t) ** 3);
+                // xcos(θ)−ysin(θ),xsin(θ)+ycos(θ))
+                grid[IX(Math.round(xpos + x * 5), Math.round(ypos + y * 5))].isObstacle = true;
             }
 
             break;
 
-        case "hypotrochoid":
+        case "star":
             for (let t = 0; t < Math.PI * 10; t += 0.0001) {
                 let x = 2 * Math.cos(t) + 5 * Math.cos(2 * t / 3);
                 let y = 2 * Math.sin(t) - 5 * Math.sin(2 * t / 3);
@@ -119,11 +129,10 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, rotationAn
 
         case "airfoil":
             // Parametric equation for airfoils, based on the paper by David Ziemkiewicz - https://arc.aiaa.org/doi/full/10.2514/1.J055986
-            let T = 0.5;
+            let thickness = 0.6 + T;
             for (let t = 0.01; t < Math.PI * 2; t += 0.01) {
                 let x = 0.5 + (0.5 * (Math.cos(t) ** 2)) / Math.cos(t);
-                let y = (T / 2) * ((Math.sin(t) ** 2) / Math.sin(t)) * (1 - x) + 0.05 * Math.sin(x * Math.PI);
-                console.log(x, y);
+                let y = (thickness / 2) * ((Math.sin(t) ** 2) / Math.sin(t)) * (1 - x) + 0.05 * Math.sin(x * Math.PI);
                 grid[IX(Math.round(xpos + x * 20), Math.round(ypos + y * 10))].isObstacle = true;
             }
         default:
@@ -132,6 +141,12 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, rotationAn
     }
 
 }
+
+function incrementPosition(a) {
+    T += c;
+    if (T > 1.5 || T < 0) c *= -1;
+}
+
 // ======================================================================================
 // PHYSICS STUFF
 
@@ -214,7 +229,7 @@ function stream() {
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
 let shapeSelection = "line";
 
-setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "airfoil", 0);
+setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0.1);
 // ======================================================================================
 // DRAW STUFF  
 // COLOR MAPS  
@@ -1516,10 +1531,10 @@ let countInRange = function (array, h, l) {
 
 // ======================================================================================
 // draw countour lines - Marching squares algo based on Rephael Wenger book https://web.cse.ohio-state.edu/~wenger.4/ "Isosurfaces: Geometry, Topology, and Algorithms" chapter 2. 
-let isovalue = [];
+let isovalues = [];
 
-for (let i = 1; i < 2; i++) {
-    isovalue.push(i / 2);
+for (let i = 0; i < 10; i++) {
+    isovalues.push(i / 10);
 }
 
 function drawContour(isovalue) {
@@ -1639,6 +1654,7 @@ function drawLine(p1, p2) {
 
 
 initialize();
+const moveObstacles = document.getElementById("moveObstacles");
 
 function simulate() {
     setCurl();
@@ -1672,15 +1688,18 @@ function simulate() {
     plotHistogram();
 
     if (plotContours.checked) {
-        for (let i = 0; i < isovalue.length; i++) {
-            ctx.strokeStyle = colorMaps[colorMapSelected](isovalue[i]);
+        for (let i = 0; i < isovalues.length; i++) {
+            ctx.strokeStyle = colorMaps[colorMapSelected](isovalues[i]);
             ctx.lineWidth = 1.3;
-            drawContour(isovalue[i]);
+            drawContour(isovalues[i]);
         }
     }
 
 
-    // setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "airfoil", rotationAngle);
+    if (moveObstacles.checked) {
+        setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, true);
+    }
+
     requestAnimationFrame(simulate);
 }
 
@@ -1864,5 +1883,6 @@ function updateResolution() {
 }
 
 resolutionSelector.addEventListener("change", updateResolution);
+
 
 

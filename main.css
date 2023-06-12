@@ -207,7 +207,7 @@ input[type="radio"]:checked+.macroLabel {
     flex-direction: column;
 }
 #reynoldsInput{
-    width: 50%;
+    width: 33%;
 }
 #label {
     display: flex;
@@ -225,5 +225,6 @@ input[type="radio"]:checked+.macroLabel {
 
 #checkBoxes{
     display: flex;
-    gap: 10%;
+    flex-direction: column;
+    gap: 20%;
 }

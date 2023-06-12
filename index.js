@@ -8,17 +8,11 @@ simulationCanvas.height = 240;
 let N = 5;
 let NX = simulationCanvas.width / N;
 let NY = simulationCanvas.height / N;
-let simage = ctx.createImageData(NX * N, NY * N);
-for (var i = 0; i < simage.data.length; i += 4) {
-    simage.data[i + 3] = 255;      // set all alpha values to "opaque"
-}
 
-console.log(simage.data.length)
 let animating = true;
 
 // ======================================================================================
 // Fluid grid set up  
-
 
 //velocity directions
 const e = [
@@ -43,6 +37,7 @@ const endAngle = Math.PI * 2;
 
 const Re = document.getElementById("reynoldsInput");
 const reynoldsDisplay = document.getElementById("reynoldsDisplay");
+
 let deltaT = 5;                             //time step
 let timeStep = 0;
 let ux0 = 0.2;                                //initial x velocity 
@@ -93,7 +88,7 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
         case "line":
             for (let x = 1; x <= 2; x++) {
                 for (let y = ypos - radius; y <= ypos + radius; y++) {
-                    grid[IX(Math.round(xpos + x), Math.round(y+T*10))].isObstacle = true;
+                    grid[IX(Math.round(xpos + x), Math.round(y + T * 10))].isObstacle = true;
                 }
             }
             break;
@@ -129,11 +124,18 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
 
         case "airfoil":
             // Parametric equation for airfoils, based on the paper by David Ziemkiewicz - https://arc.aiaa.org/doi/full/10.2514/1.J055986
-            let thickness = 0.6 + T;
-            for (let t = 0.01; t < Math.PI * 2; t += 0.01) {
-                let x = 0.5 + (0.5 * (Math.cos(t) ** 2)) / Math.cos(t);
-                let y = (thickness / 2) * ((Math.sin(t) ** 2) / Math.sin(t)) * (1 - x) + 0.05 * Math.sin(x * Math.PI);
-                grid[IX(Math.round(xpos + x * 20), Math.round(ypos + y * 10))].isObstacle = true;
+            let thickness = 6 + 3 * T;
+            let B = 2;
+            let P = 1;
+            let C = -0.05;
+            let E = 1;
+            let R = 0;
+            for (let n = 0; n <= thickness; n++) {
+                for (let t = 0.01; t < Math.PI * 2; t += 0.01) {
+                    let x = 0.5 + (0.5 * (Math.cos(t) ** B)) / Math.cos(t);
+                    let y = (n / 20) * ((Math.sin(t) ** B) / Math.sin(t)) * (1 - x ** P) + C * Math.sin((x ** E) * Math.PI) + R * Math.sin(x * Math.PI * 2);
+                    grid[IX(Math.round(xpos + x * 20), Math.round(ypos + y * 20))].isObstacle = true;
+                }
             }
         default:
 
@@ -142,9 +144,9 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
 
 }
 
-function incrementPosition(a) {
+function incrementPosition() {
     T += c;
-    if (T > 1.5 || T < 0) c *= -1;
+    if (T > 1.5 || T <= 0) c *= -1;
 }
 
 // ======================================================================================
@@ -227,7 +229,7 @@ function stream() {
 // ==================================================================================================
 //set obstacles 
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
-let shapeSelection = "line";
+let shapeSelection = "airfoil";
 
 setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0.1);
 // ======================================================================================

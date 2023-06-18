@@ -17,24 +17,34 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
 }
 
 
 /* ---------------------------------------------------------------------------------------------- */
 /* FLUID SIMULATION */
+
+
 #simulation {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 70%;
+    width: fit-content;
+    margin-top: 30px;
+    padding: 10px;
+
 }
 
 /* fluid simulation canvas ------------------------*/
 #titleCaption {
-    font-size: 1.6em;
-    text-decoration: underline;
-    text-align: center;
+    font-size: 1.5em;
+    margin-left: 7%;
+}
+
+#titleCaption>span {
+    color: rgb(57, 57, 244);
+    font-weight: bold;
 }
 
 #xPos {
@@ -72,14 +82,15 @@ input[type="range"] {
 #videoControlButtons {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    justify-content: baseline;
     grid-column-start: 2;
 }
 
 #videoControlButtons>* {
     border: none;
+    height: 30px;
     background-color: white;
-    padding: 5px;
 }
 
 #videoControlButtons>*:hover {
@@ -95,16 +106,26 @@ input[type="range"] {
     background-color: white;
 }
 
+#pauseIcon #replay{     
+    display: block;    
+}
 #playIcon {
     display: none;
+    padding-bottom: 2px;
 }
 
 #playbackSpeed {
-    font-size: 24px;
+    font-size: 20px;
+    text-align: inline block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-weight: bolder;
     color: var(--form-control-color);
 }
-#fluidButtons{
+
+
+#fluidButtons {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -114,7 +135,10 @@ input[type="range"] {
 }
 
 
-#fluidButtons:nth-child(4) { margin-left: auto; }
+#fluidButtons:nth-child(4) {
+    margin-left: auto;
+}
+
 /* PLOTS -----------------------*/
 #chartContainer {
     display: flex;
@@ -175,7 +199,7 @@ input[type="radio"] {
 
 .macroLabel:hover {
     cursor: pointer;
-    background-color: #e9e9ae;
+    background-color: #b5b5a8;
 }
 
 input[type="radio"]:checked+.macroLabel {
@@ -206,25 +230,40 @@ input[type="radio"]:checked+.macroLabel {
     display: flex;
     flex-direction: column;
 }
-#reynoldsInput{
+
+#reynoldsInput {
     width: 33%;
 }
+
 #label {
     display: flex;
     gap: 5px;
 }
 
-#trackHistory {
-    width: 15px;
-}
 
 #colorMapSelector {
     height: 30px;
     font-size: 1em;
 }
 
-#checkBoxes{
-    display: flex;
-    flex-direction: column;
-    gap: 20%;
+#checkBoxes {
+    /* display: flex; */
+    /* flex-direction: row; */
+    /* gap: 20%; */
+}
+
+#trackHistory {
+}
+#contourSpinner{
+    background-color: black;
+    width: 100px;
+}
+
+.toggleBtn{
+    background-color: white;
+    font-size: 15px;
+    width: 100px;
+    height: 30px;
+    border-radius: 30px;
+
 }

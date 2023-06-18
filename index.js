@@ -88,7 +88,7 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
         case "line":
             for (let x = 1; x <= 2; x++) {
                 for (let y = ypos - radius; y <= ypos + radius; y++) {
-                    grid[IX(Math.round(xpos + x), Math.round(y + T * 10))].isObstacle = true;
+                    grid[IX(Math.round(xpos + x), Math.round(y))].isObstacle = true;
                 }
             }
             break;
@@ -134,7 +134,7 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
                 for (let t = 0.01; t < Math.PI * 2; t += 0.01) {
                     let x = 0.5 + (0.5 * (Math.cos(t) ** B)) / Math.cos(t);
                     let y = (n / 20) * ((Math.sin(t) ** B) / Math.sin(t)) * (1 - x ** P) + C * Math.sin((x ** E) * Math.PI) + R * Math.sin(x * Math.PI * 2);
-                    grid[IX(Math.round(xpos + x * 20), Math.round(ypos + y * 20))].isObstacle = true;
+                    grid[IX(Math.round(xpos + x * 60), Math.round(ypos + y * 30))].isObstacle = true;
                 }
             }
         default:
@@ -229,7 +229,7 @@ function stream() {
 // ==================================================================================================
 //set obstacles 
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
-let shapeSelection = "airfoil";
+let shapeSelection = "line";
 
 setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0.1);
 // ======================================================================================
@@ -237,7 +237,7 @@ setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0
 // COLOR MAPS  
 const plotOptionButtons = document.querySelectorAll('#plotSelectionForm>*');
 const formInputs = document.querySelectorAll('#colors input');
-let plotSelection = "vorticity";
+let plotSelection = "ux";
 
 
 
@@ -266,7 +266,7 @@ const cubehelix = {
     Ux: cubehelixGenerator(0.9, 0, 1, 1, 1000),
     v: cubehelixGenerator(0.8, 1, 2, 1, 1000),
     rho: cubehelixGenerator(1, 10, 3, 1, 1000),
-    psychedelic: cubehelixGenerator(0.48, 100, 10, 1.5, 1000),
+    psychedelic: cubehelixGenerator(0.35, 10, 2, 1.6, 1000),
 }
 
 // other color maps adopted from Matplotlib team, Stefan van der Walt, Nathaniel J. Smith, Jey Kottalam and Nathan Goldbaum, 
@@ -1305,31 +1305,40 @@ let plasma = [
     "rgb(240.64384,249.640448,33.619456)"
 ];
 
+let linearB = [59, 40, 149];
+let linearA = [233, 255, 257];
+
 const colorMaps = {
-    linear: (a) => { return `rgb(${Math.round(lerp(153, 31, a))}, ${Math.round(lerp(242, 64, a))},${Math.round(lerp(200, 55, a))})` },
-    blackAndWhite: (a) => { return `rgb(${Math.round(lerp(0, 256, a))}, ${Math.round(lerp(0, 256, a))},${Math.round(lerp(0, 256, a))})` },
+    linear: (a) => {
+        return `rgb(${Math.round(lerp(linearA[0], linearB[0], a))}, 
+    ${Math.round(lerp(linearA[1], linearB[1], a))},${Math.round(lerp(linearA[2], linearB[2], a))})`
+    },
+    blackAndWhite: (a) => {
+        return `rgb(${Math.round(lerp(256, 0, a))}, ${Math.round(lerp(256, 0, a))},${Math.round(lerp(256, 0, a))})`
+    },
     cubeHelix: (a) => { return cubehelix.Uy[Math.round(a * cubehelix.Ux.length - 1)] },
     dracula: (a) => { return `rgb(${lerp(250, 100, a)}, ${0},${0})` },
     virdis: (a) => { return virdis[Math.round(a * virdis.length - 1)] },
     magma: (a) => { return magma[Math.round(a * magma.length - 1)] },
     inferno: (a) => { return inferno[Math.round(a * inferno.length - 1)] },
     plasma: (a) => { return plasma[Math.round(a * plasma.length - 1)] },
-    psychedelic: (a) => { return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length - 1)] },
+    psychedelic: (a) => { return cubehelix.psychedelic[Math.round(a * cubehelix.psychedelic.length)] },
 
 }
 
-let colorMapSelected = "virdis";
+let colorMapSelected = "linear";
+
 
 function draw(posx) {
     let ext = getExtremum(plotSelection);
-    let normalizedValue = 0;
+    let normalizedValue;
     // color grid 
     for (let i = 1; i < NX - 1; i++) {
         for (let j = 1; j < NY - 1; j++) {
             let index = IX(i, j);
             normalizedValue = (grid[index][plotSelection] - ext.min) / (ext.max - ext.min);
 
-            ctx.fillStyle = colorMaps[colorMapSelected](normalizedValue);
+            ctx.fillStyle = colorMaps[colorMapSelected](1 - normalizedValue);
 
             // color obstacles 
             if (grid[index].isObstacle) {
@@ -1344,21 +1353,12 @@ function draw(posx) {
         }
 
     }
-    // ctx.putImageData(simage, 0, 0);
     ctx.font = "10px Times New Roman";
     ctx.fillStyle = "rgba(0,0,100,90%)";
     ctx.fillText(`μ = ${Math.round(mu * 100) / 100}; [Ux,Uy] = [${ux0},${uy0}]; Δt:${deltaT}; step:${timeStep};`, 10, simulationCanvas.height - 10);
 
 }
 
-
-
-function setImageData(x, y, r, g, b, a) {
-    simage.data[x * (simage.width * 4) + y * 4] = r;
-    simage.data[x * (simage.width * 4) + y * 4 + 1] = g;
-    simage.data[x * (simage.width * 4) + y * 4 + 2] = b;
-    simage.data[x * (simage.width * 4) + y * 4 + 3] = a;
-}
 // color legend 
 const colorLegend = document.getElementById("colorMapLegend");
 const Ncolor = 15;
@@ -1369,8 +1369,8 @@ let legendWidth = 20;
 function setColorLegend() {
     clctx.fillStyle = "black";
     clctx.font = "10px Arial";
-    clctx.fillText("0", 23, 10);
-    clctx.fillText("1", 23, colorLegend.height - 5);
+    clctx.fillText("1", 23, 10);
+    clctx.fillText("0", 23, colorLegend.height - 5);
     for (let n = 0; n < Ncolor; n++) {
         clctx.fillStyle = colorMaps[colorMapSelected](n / Ncolor);
         clctx.fillRect(0, colorLegend.height * n / Ncolor, legendWidth, colorLegend.height);
@@ -1400,9 +1400,7 @@ const xPos = document.getElementById("xPos");
 const profilePlotxLabel = document.getElementById("xLabel");
 const plotSelectionLegend = document.getElementById("plotSelectionLegend");
 
-const trackHistory = document.getElementById("trackHistory");
-
-const plotContours = document.getElementById("contourPlot");
+let plotContours = false;
 
 
 let plotWidth = 350;
@@ -1439,8 +1437,8 @@ function plotProfile(posx) {
     gctx.moveTo(0, 0);
     gctx.lineTo(0, plotHeight);
     gctx.lineTo(plotWidth, plotHeight);
-    gctx.lineTo(plotWidth, 0);
-    gctx.lineTo(0, 0);
+    // gctx.lineTo(plotWidth, 0);
+    // gctx.lineTo(0, 0);
     gctx.stroke();
 
 
@@ -1656,8 +1654,8 @@ function drawLine(p1, p2) {
 
 
 initialize();
-const moveObstacles = document.getElementById("moveObstacles");
-
+const trackHistoryBtn = document.getElementById("trackHistory");
+let tracking = false;
 function simulate() {
     setCurl();
     ctx.clearRect(0, 0, simulationCanvas.width, simulationCanvas.height);
@@ -1665,7 +1663,7 @@ function simulate() {
     hctx.fillStyle = histogramColor.substring(0, histogramColor.length - 1) + ',20%)';
     gctx.strokeStyle = histogramColor.substring(0, histogramColor.length - 1) + ',20%)';
 
-    if (!trackHistory.checked) {
+    if (!tracking) {
         gctx.strokeStyle = "rgb(0,0,0)";
         hctx.fillStyle = "rgb(0,0,0)";
         hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
@@ -1685,22 +1683,19 @@ function simulate() {
     }
 
 
-    if (!plotContours.checked) draw(Number(xPos.value));
+    if (!plotContours) draw(Number(xPos.value));
     plotProfile(Number(xPos.value));
     plotHistogram();
 
-    if (plotContours.checked) {
+    if (plotContours) {
         for (let i = 0; i < isovalues.length; i++) {
-            ctx.strokeStyle = colorMaps[colorMapSelected](isovalues[i]);
+            ctx.strokeStyle = colorMaps[colorMapSelected](1 - isovalues[i]);
             ctx.lineWidth = 1.3;
             drawContour(isovalues[i]);
         }
     }
 
 
-    if (moveObstacles.checked) {
-        setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, true);
-    }
 
     requestAnimationFrame(simulate);
 }
@@ -1831,10 +1826,42 @@ function resetSimulation() {
 
 xPos.addEventListener("change", () => gctx.clearRect(0, 0, profilePlot.width, profilePlot.height));
 
-trackHistory.addEventListener('change', () => {
-    hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
-    gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+
+let trackHistoryCounter = 0;
+trackHistoryBtn.addEventListener('click', () => {
+    trackHistoryCounter++;
+    if (trackHistoryCounter === 1) {
+        trackHistoryBtn.style.backgroundColor = 'var(--form-control-color)';
+        trackHistoryBtn.style.color = "white";
+        tracking = true;
+        hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
+        gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
+    } else {
+        trackHistoryBtn.style.backgroundColor = "white";
+        trackHistoryBtn.style.color = "black";
+        tracking = false;
+        trackHistoryCounter = 0;
+
+    }
 });
+
+
+const contourBtn = document.getElementById("plotContour");
+let contourCounter = 0;
+contourBtn.addEventListener('click', () => {
+    contourCounter++;
+    if (contourCounter === 1) {
+        contourBtn.style.backgroundColor = 'var(--form-control-color)';
+        contourBtn.style.color = 'white';
+        plotContours = true;
+    } else {
+        contourBtn.style.backgroundColor = "white";
+        contourBtn.style.color = "black";
+        plotContours = false;
+        contourCounter = 0;
+    }
+});
+
 
 
 

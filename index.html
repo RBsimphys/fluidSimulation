@@ -13,18 +13,17 @@
     <div id="simulation">
 
         <div id="plots">
-            <figcaption id="titleCaption">Lattice boltzeman fluid simulation</figcaption>
+            <figcaption id="titleCaption"><span>Latest Project: </span>fluid dynamics simulation</figcaption>
             <div id="fluidPlotContainer">
                 <figure id="fluidPlot">
                     <canvas id="simulationCanvas"></canvas>
                     <canvas id="colorMapLegend"></canvas>
                 </figure>
                 <div id="fluidButtons">
-
                     <div id="videoControlButtons">
                         <button id="playbackSpeed">x1</button>
                         <button id="playpausebtn">
-                            <svg id="playIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
+                            <svg id="playIcon" width="20" height="18" viewBox="0 0 5.2916665 5.2916665" version="1.1"
                                 id="svg934" inkscape: version="1.1.2 (0a00cf5339, 2022-02-04)" sodipodi:
                                 docname="pausebtn.svg" xmlns: inkscape="http://www.inkscape.org/namespaces/inkscape"
                                 xmlns: sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -62,7 +61,7 @@
                                         sodipodi:nodetypes="cccc" />
                                 </g>
                             </svg>
-                            <svg id="pauseIcon" width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1"
+                            <svg id="pauseIcon" width="20" height="18" viewBox="0 0 5.2916665 5.2916665" version="1.1"
                                 id="svg934" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
                                 sodipodi:docname="pausebtn.svg"
                                 xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -91,7 +90,7 @@
                             </svg>
                         </button>
                         <button id="replay">
-                            <svg width="20" height="20" viewBox="0 0 5.2916665 5.2916665" version="1.1" id="svg5"
+                            <svg width="20" height="18" viewBox="0 0 5.2916665 5.2916665" version="1.1" id="svg5"
                                 sodipodi:docname="replay.svg" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
                                 xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
                                 xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -219,14 +218,14 @@
                 <div class="selectionForm">
                     <legend id="plotSelectionLegend">Plot:</legend>
                     <form id="plotSelectionForm">
-                        <input type="radio" id="plotVorticity" name="plotOption" value="vorticity" checked>
-                        <label class="macroLabel" for="plotVorticity">ω</label>
-                        <input type="radio" id="plotDensity" name="plotOption" value="rho">
-                        <label class="macroLabel" for="plotDensity">ρ</label>
-                        <input type="radio" id="plotUx" name="plotOption" value="ux">
+                        <input type="radio" id="plotUx" name="plotOption" value="ux" checked>
                         <label class="macroLabel" for="plotUx">V<sub>x</sub></label>
                         <input type="radio" id="plotUy" name="plotOption" value="uy">
                         <label class="macroLabel" for="plotUy">V<sub>y</sub></label>
+                        <input type="radio" id="plotVorticity" name="plotOption" value="vorticity">
+                        <label class="macroLabel" for="plotVorticity">ω</label>
+                        <input type="radio" id="plotDensity" name="plotOption" value="rho">
+                        <label class="macroLabel" for="plotDensity">ρ</label>
                     </form>
                 </div>
                 <div class="selectionForm">
@@ -289,8 +288,8 @@
                         <label class="macroLabel" for="astroid">
 
                             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-                            <svg width="10.538591mm" height="5.001896mm" viewBox="0 0 16.538591 16.001895"
-                                version="1.1" id="svg5" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+                            <svg width="10.538591mm" height="5.001896mm" viewBox="0 0 16.538591 16.001895" version="1.1"
+                                id="svg5" inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
                                 sodipodi:docname="shape3.svg"
                                 xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
                                 xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -390,11 +389,11 @@
                 <div class="selectionForm">
                     <label for="colorMapSelector">Color Map:</label>
                     <select id="colorMapSelector">
-                        <option value="linear">Linear</option>
+                        <option value="linear" selected="selected">Linear</option>
                         <option value="blackAndWhite">Black and white</option>
                         <option value="cubeHelix">Cubehelix</option>
                         <option value="dracula">Dracula</option>
-                        <option value="virdis" selected="selected">Virdis</option>
+                        <option value="virdis">Virdis</option>
                         <option value="magma">Magma</option>
                         <option value="inferno">Inferno</option>
                         <option value="plasma">Plasma</option>
@@ -404,28 +403,23 @@
                 </div>
             </div>
 
-
             <label for="reynoldsInput" id='reLabel'><span id="reynoldsDisplay"></span>
                 <input type="range" min="10" max="100" step="0.5" value="70" id="reynoldsInput">
             </label>
-
             <div id="checkBoxes">
-                <label for="trackHistory" class="label">track history:
-                    <input type="checkbox" id="trackHistory">
-                </label>
-                <label for="contourPlot" class="label">Plot contours:
-                    <input type="checkbox" id="contourPlot">
-                </label>
-                <label for="moveObstacles" class="label">Move Obstacles:
-                    <input type="checkbox" id="moveObstacles">
-                </label>
+
+                <div>
+                    <button type="button" id="plotContour" class="toggleBtn">Contours</button>
+                    <div id="contourSpinner"></div>
+                </div>
+                <button type="button" id="trackHistory" class="toggleBtn">History</button>
+
             </div>
+
         </fieldset>
 
-    </div>
 
-
-    <script src="index.js" type="module"></script>
+        <script src="index.js" type="module"></script>
 </body>
 
 </html>

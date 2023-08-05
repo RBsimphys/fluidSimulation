@@ -36,7 +36,6 @@ const endAngle = Math.PI * 2;
 
 
 const Re = document.getElementById("reynoldsInput");
-const reynoldsDisplay = document.getElementById("reynoldsDisplay");
 
 let deltaT = 5;                             //time step
 let timeStep = 0;
@@ -76,13 +75,9 @@ let T = 0;
 let c = 0.1;
 // Obstacle 
 
-function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
+function setObstacle(radius, xpos, ypos, shape) {
     clearObstacles();
-    if (moving) {
-        incrementPosition();
-    } else {
-        T = 0;
-    }
+
 
     switch (shape) {
         case "line":
@@ -144,6 +139,8 @@ function setObstacle(radius, xpos, ypos, startAngle, endAngle, shape, moving) {
 
 }
 
+
+
 function incrementPosition() {
     T += c;
     if (T > 1.5 || T <= 0) c *= -1;
@@ -197,28 +194,33 @@ function collide() {
 const fbounce = [0, 5, 6, 7, 8, 1, 2, 3, 4];
 function stream() {
     // N NE E SE S        
+    let i;
     for (let x = NX - 2; x > 0; x--) {
         for (let y = NY - 2; y > 0; y--) {
-            grid[IX(x, y)].fi[1] = grid[IX(x, y - 1)].fi[1];
-            grid[IX(x, y)].fi[2] = grid[IX(x - 1, y - 1)].fi[2];
-            grid[IX(x, y)].fi[3] = grid[IX(x - 1, y)].fi[3];
-            grid[IX(x, y)].fi[4] = grid[IX(x - 1, y + 1)].fi[4];
+            i = IX(x,y); 
+
+            grid[i].fi[1] = grid[i-NX].fi[1];
+            grid[i].fi[2] = grid[i-1-NX].fi[2];
+            grid[i].fi[3] = grid[i-1].fi[3];
+            grid[i].fi[4] = grid[i-1+NX].fi[4];
         }
         for (let y = 1; y < NY - 1; y++) {
-            grid[IX(x, y)].fi[5] = grid[IX(x, y + 1)].fi[5];
+            i = IX(x,y); 
+            grid[i].fi[5] = grid[i+NX].fi[5];
         }
     }
 
     for (let x = 1; x < NX - 2; x++) {
         for (let y = NY - 2; y > 1; y--) {
+            i = IX(x,y); 
             // SW W NW
-            grid[IX(x, y)].fi[6] = grid[IX(x + 1, y + 1)].fi[6];
-            grid[IX(x, y)].fi[7] = grid[IX(x + 1, y)].fi[7];
-            grid[IX(x, y)].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
+            grid[i].fi[6] = grid[IX(x + 1, y + 1)].fi[6];
+            grid[i].fi[7] = grid[i+1].fi[7];
+            grid[i].fi[8] = grid[IX(x + 1, y - 1)].fi[8];
             // handle obstacles 
-            if (grid[IX(x, y)].isObstacle) {
+            if (grid[i].isObstacle) {
                 for (let n = 1; n < 9; n++) {
-                    grid[IX(x, y)].fi[n] = grid[IX(x, y)].fi[fbounce[n]];
+                    grid[i].fi[n] = grid[i].fi[fbounce[n]];
                 }
             }
         }
@@ -231,7 +233,7 @@ function stream() {
 const shapeOptionButtons = document.querySelectorAll('#shapeSelectionForm>*');
 let shapeSelection = "line";
 
-setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0.1);
+setObstacle(obsRadius, obsXpos, obsYpos, shapeSelection);
 // ======================================================================================
 // DRAW STUFF  
 // COLOR MAPS  
@@ -1329,6 +1331,7 @@ const colorMaps = {
 let colorMapSelected = "linear";
 
 
+console.log(colorMaps[colorMapSelected](0.5));
 function draw(posx) {
     let ext = getExtremum(plotSelection);
     let normalizedValue;
@@ -1360,29 +1363,54 @@ function draw(posx) {
 }
 
 // color legend 
+let isovalues = [];
+
+function setIsovalues(a) {
+    isovalues = [];
+    for (let i = 1; i <= a; i++) {
+        isovalues.push(i / (a + 1));
+    }
+}
+
+setIsovalues(5)
+let plotContours = false;
+
+
 const colorLegend = document.getElementById("colorMapLegend");
 const Ncolor = 15;
 let clctx = colorLegend.getContext("2d");
 colorLegend.width = 50;
 colorLegend.height = 120;
 let legendWidth = 20;
+
 function setColorLegend() {
+
+    if (plotContours) {
+        clctx.clearRect(0, 0, colorLegend.width, colorLegend.height)
+        for (let i = 0; i < isovalues.length; i++) {
+            clctx.fillStyle = colorMaps[colorMapSelected](isovalues[i]);
+            clctx.fillRect(0, colorLegend.height * isovalues[i], legendWidth, 8);
+        }
+        clctx.beginPath();
+        clctx.moveTo(0, 0);
+        clctx.lineTo(0, colorLegend.height);
+        clctx.lineTo(legendWidth, colorLegend.height);
+        clctx.lineTo(legendWidth, 0);
+        clctx.lineTo(0, 0);
+        clctx.stroke();
+    }
+    else {
+        for (let n = 0; n < Ncolor; n++) {
+            clctx.fillStyle = colorMaps[colorMapSelected](n / Ncolor);
+            clctx.fillRect(0, colorLegend.height * n / Ncolor, legendWidth, colorLegend.height);
+        }
+    }
     clctx.fillStyle = "black";
     clctx.font = "10px Arial";
     clctx.fillText("1", 23, 10);
     clctx.fillText("0", 23, colorLegend.height - 5);
-    for (let n = 0; n < Ncolor; n++) {
-        clctx.fillStyle = colorMaps[colorMapSelected](n / Ncolor);
-        clctx.fillRect(0, colorLegend.height * n / Ncolor, legendWidth, colorLegend.height);
-    }
     // // draw graph borders 
-    // clctx.beginPath();
-    // clctx.moveTo(0, 0);
-    // clctx.lineTo(0, colorLegend.height);
-    // clctx.lineTo(legendWidth, colorLegend.height);
-    // clctx.lineTo(legendWidth, 0);
-    // clctx.lineTo(0, 0);
-    // clctx.stroke();
+
 }
 
 setColorLegend();
@@ -1400,7 +1428,6 @@ const xPos = document.getElementById("xPos");
 const profilePlotxLabel = document.getElementById("xLabel");
 const plotSelectionLegend = document.getElementById("plotSelectionLegend");
 
-let plotContours = false;
 
 
 let plotWidth = 350;
@@ -1491,7 +1518,7 @@ function plotHistogram() {
 
     let norm_data = data.map(x => ((x - min) / (max - min))).sort((a, b) => a - b);
     // let norm_data = [0, 0.1, 0.1, 0.2, 0.3, 0.4, 0.6];
-    let numBins = 500;
+    let numBins = 50;
     let bins = [];
     for (let i = 1; i <= numBins; i++) {
         bins.push(countInRange(norm_data, i / numBins, (i - 1) / numBins));
@@ -1531,11 +1558,7 @@ let countInRange = function (array, h, l) {
 
 // ======================================================================================
 // draw countour lines - Marching squares algo based on Rephael Wenger book https://web.cse.ohio-state.edu/~wenger.4/ "Isosurfaces: Geometry, Topology, and Algorithms" chapter 2. 
-let isovalues = [];
 
-for (let i = 0; i < 10; i++) {
-    isovalues.push(i / 10);
-}
 
 function drawContour(isovalue) {
     let ext = getExtremum(plotSelection);
@@ -1673,7 +1696,6 @@ function simulate() {
     if (animating) {
         mu = ux0 * obsRadius / Re.value;            //update viscosity
         omega = 1 / (3 * mu + 0.5);                 //update relaxation parameter
-        reynoldsDisplay.textContent = `Reynolds number: ${Re.value}`
 
         for (let i = 1; i < deltaT; i++) {
             collide();
@@ -1682,7 +1704,6 @@ function simulate() {
         }
     }
 
-
     if (!plotContours) draw(Number(xPos.value));
     plotProfile(Number(xPos.value));
     plotHistogram();
@@ -1690,11 +1711,10 @@ function simulate() {
     if (plotContours) {
         for (let i = 0; i < isovalues.length; i++) {
             ctx.strokeStyle = colorMaps[colorMapSelected](1 - isovalues[i]);
-            ctx.lineWidth = 1.3;
+            ctx.lineWidth = 1.8;
             drawContour(isovalues[i]);
         }
     }
-
 
 
     requestAnimationFrame(simulate);
@@ -1719,14 +1739,14 @@ function IX(i, j) {
     return i + NX * j;
 }
 
-function curl(i, j) {
+function getcurl(i, j) {
     return (grid[IX(i, j + 1)].ux - grid[IX(i, j - 1)].ux) - (grid[IX(i - 1, j)].uy - grid[IX(i - 1, j)].uy);
 }
 
 function setCurl() {
     for (let i = 1; i < NX - 1; i++) {
         for (let j = 1; j < NY - 1; j++) {
-            grid[IX(i, j)].vorticity = curl(i, j);
+            grid[IX(i, j)].vorticity = getcurl(i, j);
         }
 
     }
@@ -1752,7 +1772,7 @@ simulationCanvas.addEventListener('click', (e) => {
     // obsXpos = mouse.i;
     // obsYpos = mouse.j;
 
-    setObstacle(obsRadius, x - obsRadius, y - obsRadius, startAngle, endAngle, shapeSelection);
+    setObstacle(obsRadius, x - obsRadius, y - obsRadius, shapeSelection);
     // particles.push(new Particle(x, y))
     // console.log(mouse.i, mouse.j);
     console.log(grid[IX(x, y)]);
@@ -1778,7 +1798,7 @@ for (let i = 0; i < shapeOptionButtons.length; i++) {
         if (event.target.checked) {
             shapeSelection = event.target.value;
             resetSimulation();
-            setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection);
+            setObstacle(obsRadius, obsXpos, obsYpos, shapeSelection);
             gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
             hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
         }
@@ -1817,7 +1837,7 @@ function clearObstacles() {
 
 function resetSimulation() {
     initialize();
-    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, "line");
+    setObstacle(obsRadius, obsXpos, obsYpos, "line");
     hctx.clearRect(0, 0, histogramPlot.width, histogramPlot.height);
     gctx.clearRect(0, 0, profilePlot.width, profilePlot.height);
     timeStep = 0;
@@ -1851,18 +1871,29 @@ let contourCounter = 0;
 contourBtn.addEventListener('click', () => {
     contourCounter++;
     if (contourCounter === 1) {
-        contourBtn.style.backgroundColor = 'var(--form-control-color)';
+        contourBtn.style.backgroundColor = 'var(--border-color)';
         contourBtn.style.color = 'white';
         plotContours = true;
+
+        setColorLegend();
     } else {
         contourBtn.style.backgroundColor = "white";
         contourBtn.style.color = "black";
         plotContours = false;
         contourCounter = 0;
+
+        setColorLegend();
     }
 });
 
 
+const contourSpinner = document.getElementById("contourSpinner");
+contourSpinner.addEventListener('change', () => {
+    setIsovalues(Number(contourSpinner.value));
+
+    setColorLegend();
+
+})
 
 
 
@@ -1906,7 +1937,7 @@ function updateResolution() {
     obsYpos = NY * 0.5;
     createGrid();
     initialize();
-    setObstacle(obsRadius, obsXpos, obsYpos, startAngle, endAngle, shapeSelection, 0);
+    setObstacle(obsRadius, obsXpos, obsYpos, shapeSelection);
 
     xPos.max = NX;
 }
@@ -1915,3 +1946,10 @@ resolutionSelector.addEventListener("change", updateResolution);
 
 
 
+let obstacleRadiusInput = document.getElementById('obstacleRadiusInput');
+
+obstacleRadiusInput.addEventListener("change", () => {
+    console.log(obstacleRadiusInput.value)
+    obsRadius = Number(obstacleRadiusInput.value) * NY;
+    setObstacle(obsRadius, obsXpos, obsYpos, shapeSelection);
+})

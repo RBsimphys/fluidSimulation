@@ -8,7 +8,9 @@
 
 :root {
     --form-control-color: rgb(75, 75, 75);
-
+    --border-color: rgb(75, 75, 75);
+    --fill-color: rgb(75, 75, 75);
+    --text-color: rgb(75, 75, 75);
 }
 
 body {
@@ -52,8 +54,34 @@ body {
 }
 
 input[type="range"] {
-    accent-color: var(--form-control-color);
+    accent-color: var(--border-color);
 
+}
+
+#contourControl {
+    display: flex;
+    align-items: center;
+}
+
+#plotContour {
+    border-radius: 0;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-right: 1px solid black;
+    height: 30px;
+}
+
+#contourSpinner {
+    /* position: absolute; */
+    /* left: 95%; */
+    /* top: 50.25%; */
+    width: 40px;
+    font-size: 1em;
+    text-align: center;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-left: none;
+    height: 30px;
 }
 
 #fluidPlotContainer {
@@ -81,16 +109,15 @@ input[type="range"] {
 
 #videoControlButtons {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: baseline;
+    gap: 20px;
     grid-column-start: 2;
 }
 
 #videoControlButtons>* {
     border: none;
-    height: 30px;
     background-color: white;
+    cursor: pointer;
+    height: 30px;
 }
 
 #videoControlButtons>*:hover {
@@ -101,25 +128,23 @@ input[type="range"] {
     text-align: center;
     font-size: 15px;
     width: 50px;
-    height: 20px;
+    height: 30px;
     border-radius: 10%;
     background-color: white;
 }
 
-#pauseIcon #replay{     
-    display: block;    
+#pauseIcon #replay {
+    display: block;
 }
+
 #playIcon {
     display: none;
     padding-bottom: 2px;
 }
 
 #playbackSpeed {
-    font-size: 20px;
-    text-align: inline block;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-size: 23.2px;
+    text-align: center;
     font-weight: bolder;
     color: var(--form-control-color);
 }
@@ -129,9 +154,9 @@ input[type="range"] {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-column-gap: 5px;
     justify-items: center;
     align-items: center;
+    margin-bottom: 4px;
 }
 
 
@@ -174,15 +199,13 @@ input[type="radio"] {
 
 
 #plotForm {
-    display: flex;
-    flex-direction: column;
-    margin-top: 2rem;
-    gap: 20px;
-    grid-row: 3 / span 1;
-    grid-column: 1 / span 1;
+    margin-top: 30px;
+    /* border: 1px var(--border-color) solid; */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    gap: 30px;
     width: 600px;
-    justify-content: center;
-    align-self: center;
     padding: 10px;
 }
 
@@ -203,14 +226,8 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked+.macroLabel {
-    background-color: var(--form-control-color);
+    background-color: var(--fill-color);
     color: white;
-}
-
-#selectionFormContainer {
-    display: flex;
-    flex-direction: row;
-    gap: 10%;
 }
 
 .selectionForm {
@@ -226,44 +243,40 @@ input[type="radio"]:checked+.macroLabel {
     gap: 10px;
 }
 
-#reLabel {
-    display: flex;
-    flex-direction: column;
-}
-
-#reynoldsInput {
-    width: 33%;
-}
-
-#label {
-    display: flex;
-    gap: 5px;
-}
-
 
 #colorMapSelector {
     height: 30px;
     font-size: 1em;
 }
 
-#checkBoxes {
-    /* display: flex; */
-    /* flex-direction: row; */
-    /* gap: 20%; */
-}
 
-#trackHistory {
-}
-#contourSpinner{
-    background-color: black;
-    width: 100px;
-}
-
-.toggleBtn{
+.toggleBtn {
     background-color: white;
-    font-size: 15px;
+    font-size: 1em;
     width: 100px;
     height: 30px;
     border-radius: 30px;
+    cursor: pointer;
+}
 
+#trackHistory {
+    width: 80%;
+}
+
+#reynoldsInput {
+    width: 40px;
+    font-size: 1em;
+}
+
+#reLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* flex-direction: column; */
+}
+
+
+#obstacleRadiusLabel {
+    display: flex;
+    flex-direction: column;
 }

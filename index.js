@@ -1,3 +1,29 @@
+/*
+  implements a two-dimensional fluid simulation using the lattice Boltzmann method. 
+  The simulation is visualized on an HTML5 canvas element, where fluid dynamics are represented by a grid of cells.
+  Each cell contains information about fluid density, velocity, and whether it is part of an obstacle. 
+  The simulation progresses through discrete time steps, updating the state of the fluid according to collision and streaming processes. 
+  The user can interactively set obstacles of various shapes within the fluid domain, enabling the study of fluid flow around complex geometries.
+  Parameters such as Reynolds number and obstacle shapes can be adjusted to observe their effects on the fluid behavior. 
+  This project serves as an educational tool for understanding fluid dynamics and the lattice Boltzmann method's application in simulating complex fluid phenomena.
+*/
+
+/*
+
+Resources and adaptations: 
+Guo, Z., & Shu, C. (2013). Lattice Boltzmann Method and Its Applications in Engineering. Advances in Computational Fluid Dynamics, 420. https://doi.org/10.1142/8806
+
+Heavily relied on this course to understand and implement the algorithm: 
+https://www.coursera.org/learn/modeling-simulation-natural-processes
+
+To understand general concepts and other applications: 
+https://www.youtube.com/watch?v=JKQ0XdjLo7M&ab_channel=CyprienRusu
+
+virdis color map based on MatplotLib: 
+https://matplotlib.org/stable/users/explain/colors/colormaps.html
+
+*/
+
 
 // ===================================================================================
 // Canvas setup  

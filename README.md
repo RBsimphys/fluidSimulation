@@ -18,9 +18,8 @@ The fluid simulation utilizes the lattice Boltzmann method, a computational tech
 - Educational tool for understanding fluid dynamics and the lattice Boltzmann method.
 
 ## Usage
-
-To run the simulation, simply open the `index.html` file in a web browser that supports HTML5 canvas.
-
+page: https://rbsimphys.github.io/fluidSimulation/
+Or to run the simulation locally, simply open the `index.html` file in a web browser that supports HTML5 canvas.
 
 ## TODO
 - Refactor code for improved readability and maintainability.
